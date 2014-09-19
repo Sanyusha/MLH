@@ -1,4 +1,6 @@
-package com.example.mlh;
+package android.mlh.ui;
+
+import com.example.mlh.R;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
