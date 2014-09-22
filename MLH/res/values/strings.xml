@@ -4,5 +4,7 @@
     <string name="app_name">MLH</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="create_new_task">Create new task</string>
+	<string name="main_no_items">No plugins</string>
+	
 </resources>

@@ -22,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="android.mlh.ui.NewTaskActivity"
+            android:label="@string/create_new_task" >
+        </activity>
     </application>
 
 </manifest>
