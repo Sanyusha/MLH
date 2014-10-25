@@ -4,7 +4,19 @@
     <string name="app_name">MLH</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    
     <string name="create_new_task">Create new task</string>
+    <string name="new_task">New task</string>
+    <string name="enter_task_name">Enter task name</string>
+    
+    <string name="experiment_list">Experiment list</string>
+    
+    <string name="create_new_experiment">Create new experiment</string>
 	<string name="main_no_items">No plugins</string>
+	<string name="plugin_type_not_exists">Plugin type does not exist</string>
+	<string name="no_connection_to_remote_interface">Can not connect to remote interface</string>
 	
+	<string name="save">Save</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Cancel</string>
 </resources>
