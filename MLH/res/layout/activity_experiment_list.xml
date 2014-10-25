@@ -6,11 +6,11 @@
     >
 	
     <Button
-        android:id="@+id/btn_new_task"
+        android:id="@+id/btn_new_experiment"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="59dp"
-        android:text="@string/create_new_task" />
+        android:text="@string/create_new_experiment" />
     
   <ListView android:id="@+id/android:list"
         android:layout_width="fill_parent"
