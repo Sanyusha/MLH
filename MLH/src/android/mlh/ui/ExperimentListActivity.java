@@ -1,34 +1,25 @@
 package android.mlh.ui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.mlh.bl.files.FileManager;
-import android.mlh.bl.plugins.PluginManager;
-import android.mlh.bl.tasks.Task;
+import android.mlh.aidl.Experiment;
 import android.mlh.bl.tasks.TaskManager;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.mlh.R;
 
 
-public class MainActivity extends ListActivity {
+public class ExperimentListActivity extends ListActivity {
 	private SimpleAdapter itemAdapter;
 	private ArrayList<HashMap<String,String>> savedTasks;
 	static final String KEY_PKG = "pkg";
@@ -37,15 +28,15 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_experiment_list);
         
         savedTasks = new ArrayList<HashMap<String,String>>();
         
-        for (String el: FileManager.getInstance(getApplicationContext()).getSavedTasks()) {
-        	Log.d("MainActivity", el);
+        for (Experiment el: TaskManager.getInstance().getCurrentTask().getExperiments()) {
+        	
         	HashMap<String,String> item = new HashMap<String,String>();
-            item.put( KEY_PKG, el );
-            item.put( KEY_SERVICENAME, FileManager.getInstance(getApplicationContext()).getTaskPath(el));
+            item.put( KEY_PKG, el.toString());
+            item.put( KEY_SERVICENAME, "" );
             savedTasks.add( item );
         }
         
@@ -58,7 +49,7 @@ public class MainActivity extends ListActivity {
     				);
             setListAdapter(itemAdapter);
             
-        Button btnNewTask = (Button) findViewById(R.id.btn_new_task);
+        Button btnNewTask = (Button) findViewById(R.id.btn_new_experiment);
         btnNewTask.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
@@ -68,34 +59,13 @@ public class MainActivity extends ListActivity {
     }
     
     protected void onListItemClick (ListView l, View v, int position, long id) {
-    	final TextView tv = (TextView) v.findViewById(R.id.pkg);
+    	final TextView tv = (TextView) v.findViewById(R.id.servicename);
     	
     	
+    	Intent intent = new Intent(this, ExperimentActivity.class);
+		
+		startActivity(intent);
     	
-    	Task task;
-    	
-		try {
-			
-			task = FileManager.getInstance(getApplicationContext())
-					.getTask(tv.getText().toString());
-			
-			
-			
-			TaskManager.getInstance().setCurrentTask(task);
-			  
-			Intent intent = new Intent(this, ExperimentListActivity.class);
-			
-			startActivity(intent);
-			
-		} catch (ClassNotFoundException e) {
-			Log.d("MainActivity", e.getMessage());
-			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-			
-		} catch (IOException e) {
-			Log.d("MainActivity", e.getMessage());
-			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-			
-		}
     }
 
     /** Called when the user clicks the Send button */
