@@ -31,9 +31,9 @@ public class ExperimentActivity extends Activity{
 	private OnClickListenerProxy listener;
 	private Experiment experiment;
 	private int currExperiment;
-	
+
 	private final static String LOG_D = "ExperimentListActivity";
-	
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment);
@@ -41,13 +41,13 @@ public class ExperimentActivity extends Activity{
 		inflater = LayoutInflater.from( this );
 		listener = new OnClickListenerProxy();
 		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-		
+
 		if (PluginManager.getInstance().getCurrentPlugin() == null) {
 			Log.d(LOG_D, "current plugin not selected");
 			txtTitle.setText("current plugin not selected");
 			return;
 		}
-		
+
 		try {
 			txtTitle.setText(PluginManager.getInstance().getCurrentPlugin().getPluginType());
 		} catch (RemoteException e) {
@@ -60,15 +60,16 @@ public class ExperimentActivity extends Activity{
 		registerButtonListener();
 
 		setSaveButtonListener();
+		setCancelButtonListener();
 		
 		currExperiment = TaskManager.getInstance().getCurrentTask().getCurrentExperiment();
-		
+
 		if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			experiment = new Experiment();
 		} else {
 			experiment = TaskManager.getInstance().getCurrentTask().getExperiments().get(currExperiment);
 			Bundle state;
-			
+
 			try {
 				state = PluginManager.getInstance().getCurrentPlugin().getState(experiment);
 				Log.d(LOG_D, "SOKOL2");
@@ -78,9 +79,9 @@ public class ExperimentActivity extends Activity{
 				e.printStackTrace();
 			}
 		}
-		
+
 		captureState();
-		
+
 		//TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
 	}
 
@@ -96,19 +97,19 @@ public class ExperimentActivity extends Activity{
 					Log.d("ExperimentActivity", "result set in plugin");
 
 					experiment = PluginManager.getInstance().getCurrentPlugin().getExperiment(captureState());
-					
+
 					if (experiment == null) {
 						Log.d("ExperimentActivity", "getExperiment() returned null");
 					} else {
 						if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 							TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
 							currExperiment = TaskManager.getInstance().getCurrentTask().getExperiments().size() - 1;
-							
+
 							TaskManager.getInstance().getCurrentTask().setCurrentExperiment(currExperiment);
 						} else {
 							TaskManager.getInstance().getCurrentTask().getExperiments().set(currExperiment, experiment);
 						}
-						
+
 						FileManager.getInstance(getApplicationContext()).saveTask(TaskManager.getInstance().getCurrentTask());
 
 						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
@@ -122,6 +123,19 @@ public class ExperimentActivity extends Activity{
 				}
 
 				Log.d("ExperimentActivity", "Experiment added: " + experiment.toString());
+			}
+		});
+	}
+
+	/**
+	 * The current behavior of the cancel button is identical to Android back button
+	 */
+	private void setCancelButtonListener() {
+		Button btn = (Button) findViewById(R.id.btnCancel);
+
+		btn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				onBackPressed();
 			}
 		});
 	}
@@ -149,25 +163,25 @@ public class ExperimentActivity extends Activity{
 				}
 		}        
 	}
-	
+
 	/**
 	 * Populates the field of the Experiment form
 	 * with the bundle received from the current plugin.
 	 */
 	private void populateExperimentForm(Bundle state) {
 		Log.d(LOG_D, "populating experiment form from " + state);
-		
+
 		for (String key: state.keySet()) {
 			//TextView tv = (TextView) findViewById(Integer.getInteger(key) + idOffset);
 			int viewID = Integer.parseInt(key) + idOffset;
-			 
+
 			Log.d(LOG_D, "key = " + viewID + ", value = " + state.getString(key));
 			TextView tv = (TextView) findViewById(viewID);
-			
+
 			tv.setText(state.getString(key));
 		}     
 	}
-	
+
 	private void registerButtonListener() {
 		ViewGroup parentView = (ViewGroup)findViewById( R.id.expLL );
 
@@ -223,8 +237,6 @@ public class ExperimentActivity extends Activity{
 				} catch( RemoteException ex ) {
 
 				}
-
-
 
 				if( result != null ) {
 
