@@ -1,13 +1,15 @@
 package android.mlh.aidl;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
-public final class Experiment implements Parcelable {
+public final class Experiment implements Parcelable, Serializable {
     
+	private static final long serialVersionUID = 1L;
 	private HashMap<String, String> mParameters;
 	private String mResult;
 	
@@ -29,6 +31,10 @@ public final class Experiment implements Parcelable {
     	mParameters.put(paramName, paramValue);
     }
     
+    public String getParameter(String paramName) {
+    	return mParameters.get(paramName);
+    }
+    
     public void setResult(String result) {
     	mResult = result;
     }
@@ -39,6 +45,7 @@ public final class Experiment implements Parcelable {
 	}
 
 	private Experiment(Parcel in) {
+		mParameters = new HashMap<String, String>();
         readFromParcel(in);
     }
 
@@ -48,8 +55,13 @@ public final class Experiment implements Parcelable {
     }
 
     public void readFromParcel(Parcel in) {
+    	//Log.d("Experiment", in.dataSize() + ":::" + in.readString());
         mResult = in.readString();
-        //mParameters = in.readHashMap(loader); // NULL NOT GOOD !!!
+        int count = in.readInt();
+        //Log.d("Experiment", in.dataSize() + ":::" + in.readString());
+        for (int i = 0; i < count; i++) {
+            mParameters.put(in.readString(), in.readString());
+        }
     }
 
 	@Override

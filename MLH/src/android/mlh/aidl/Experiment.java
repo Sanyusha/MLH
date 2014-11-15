@@ -34,6 +34,9 @@ public final class Experiment implements Parcelable, Serializable {
     public void addParameter(String paramName, String paramValue) {
     	mParameters.put(paramName, paramValue);
     }
+    public String getParameter(String paramName) {
+    	return mParameters.get(paramName);
+    }
     
     public void setResult(String result) {
     	mResult = result;
@@ -50,7 +53,7 @@ public final class Experiment implements Parcelable, Serializable {
     }
 
     public void writeToParcel(Parcel out) {
-        out.writeString(mResult);
+        out.writeString("AAAAAAAAAAAAAAAAA");
         //out.writeMap(mParameters);
     }
 
@@ -72,7 +75,11 @@ public final class Experiment implements Parcelable, Serializable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		// TODO Auto-generated method stub
-		
+		dest.writeString(mResult);
+		dest.writeInt(mParameters.size());
+        for (String s: mParameters.keySet()) {
+            dest.writeString(s);
+            dest.writeString(mParameters.get(s));
+        }
 	}
 }

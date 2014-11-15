@@ -56,6 +56,12 @@ public class FileManager {
         return task;
 	}
 	
+	public void deleteTask(String taskName) throws IOException, ClassNotFoundException {
+		File file = new File(getTaskPath(taskName));
+        
+        file.delete();
+	}
+	
 	public String getTaskPath(String taskName) {
 		String filename = taskName + 
 				FileConstatns.OBJECT_FILE_NAME_EXT;

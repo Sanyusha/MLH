@@ -63,14 +63,24 @@ public class CookingPluginService extends Service {
 			result.setResult("55");
 			String o = state.getString(Integer.toString(R.id.edit1));
 			
-			if( o != null ) {
+			if( o != null && o.length() > 0) {
 				result.addParameter(GENERAL_TEXT, o);
 				result.setResult("100");
-			} else {
-				result.setResult("55");
 			}
 			
 			return result;
+		}
+		
+		public Bundle getState(Experiment experiment) {
+			Bundle state = new Bundle();
+			
+			if (experiment != null) {
+				state.putString(Integer.toString(R.id.edit1), experiment.getParameter(GENERAL_TEXT));
+			} else {
+				state.putString(Integer.toString(R.id.edit1), "null");
+			}
+			
+			return state;
 		}
     };
 }

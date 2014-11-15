@@ -18,7 +18,7 @@
          >
         <activity
             android:name="android.mlh.ui.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/task_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,19 +1,28 @@
 package android.mlh.bl.plugins;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.mlh.aidl.IMLHPlugin;
 import android.util.Log;
 
 public class PluginManager {
 	
+	public static final String ACTION_PICK_PLUGIN = "aexp.intent.action.PICK_PLUGIN";
+	
 	private static PluginManager _instance = null;
 	
-	public static HashMap<String, IMLHPlugin> plugins; 
-	public static String currPluginName;
+	private List<HashMap<String,String>> services;
+	
+	private HashMap<String, IMLHPlugin> plugins;
+	
+	private String currPluginName;
 	
 	private PluginManager() {
 		plugins = new HashMap<String, IMLHPlugin>();
+		services = new ArrayList<HashMap<String, String>>();
+		
 		currPluginName = "";
 	}
 	
@@ -37,5 +46,17 @@ public class PluginManager {
 	
 	public IMLHPlugin getCurrentPlugin() {
 		return plugins.get(currPluginName);
+	}
+	
+	public List<HashMap<String,String>> getServices() {
+		return services;
+	}
+	
+	public void addService(HashMap<String,String> service) {
+		services.add(service);
+	}
+	
+	public void clearServices() {
+		services.clear();
 	}
 }
