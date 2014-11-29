@@ -54,18 +54,18 @@ public class CookingPluginService extends Service {
 		
 		public void setExperiment(Experiment experiment) {
 			mExperiment = experiment;
-			Log.d("Plugin", "Sokol");
 		}
 		
 		public Experiment getExperiment(Bundle state) {
-			Experiment result = new Experiment();
+			Experiment result = mExperiment;
 			
-			result.setResult("55");
+			result.setResultScore("55");
+			
 			String o = state.getString(Integer.toString(R.id.edit1));
 			
 			if( o != null && o.length() > 0) {
 				result.addParameter(GENERAL_TEXT, o);
-				result.setResult("100");
+				result.setResultScore("100");
 			}
 			
 			return result;

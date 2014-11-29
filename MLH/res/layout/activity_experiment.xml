@@ -2,38 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/txtTitle"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
         style="@style/TitleFont"
-  	/>
-	
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/viewPager"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
     <LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="0dp"
-	    android:orientation="vertical"
-	    android:layout_weight="1"
-	    android:layout_margin="5dp"
-	    android:id="@+id/expLL" 
-    />
-    
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="70dp"
-	    android:orientation="horizontal"
-    >
-	    <Button android:id="@+id/btnSave"
-	        android:text="@string/save"
-	        style="@style/Button"
-        />
-	    
-	    <Button android:id="@+id/btnCancel"
-	        android:text="@string/cancel"
-	        style="@style/Button"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btnSave"
+            style="@style/Button"
+            android:text="@string/save" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/Button"
+            android:text="@string/cancel" />
     </LinearLayout>
+
 </LinearLayout>

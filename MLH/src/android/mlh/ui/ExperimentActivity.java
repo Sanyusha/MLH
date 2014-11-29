@@ -2,11 +2,6 @@ package android.mlh.ui;
 
 import java.io.IOException;
 
-import android.app.Activity;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
 import android.mlh.aidl.Experiment;
 import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
@@ -14,8 +9,12 @@ import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,22 +23,17 @@ import android.widget.Toast;
 
 import com.example.mlh.R;
 
-public class ExperimentActivity extends Activity{
-
-	private LayoutInflater inflater;
-	private final static int idOffset = 100;
-	private OnClickListenerProxy listener;
+public class ExperimentActivity extends FragmentActivity{
 	private Experiment experiment;
 	private int currExperiment;
-
+	private MyPagerAdapter pageAdapter;
+	
 	private final static String LOG_D = "ExperimentListActivity";
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment);
 
-		inflater = LayoutInflater.from( this );
-		listener = new OnClickListenerProxy();
 		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 
 		if (PluginManager.getInstance().getCurrentPlugin() == null) {
@@ -54,35 +48,74 @@ public class ExperimentActivity extends Activity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		inflateToView();
-
-		registerButtonListener();
-
-		setSaveButtonListener();
-		setCancelButtonListener();
 		
-		currExperiment = TaskManager.getInstance().getCurrentTask().getCurrentExperiment();
+		setSaveButtonListener();
+		
+		setCancelButtonListener();
 
+		currExperiment = TaskManager.getInstance().getCurrentTask().getCurrentExperiment();
+		
+		Bundle state = new Bundle();
+		
 		if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			experiment = new Experiment();
 		} else {
 			experiment = TaskManager.getInstance().getCurrentTask().getExperiments().get(currExperiment);
-			Bundle state;
-
+			
 			try {
 				state = PluginManager.getInstance().getCurrentPlugin().getState(experiment);
-				Log.d(LOG_D, "SOKOL2");
-				populateExperimentForm(state);
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
-		captureState();
+		
+		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
+		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state);
+		pager.setAdapter(pageAdapter);
+		
+		//captureState();
 
 		//TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
+	}
+
+	private class MyPagerAdapter extends FragmentPagerAdapter {
+		private Fragment mCurrentFragment;
+		private Bundle mInitState;
+		
+        public Fragment getCurrentFragment() {
+            return mCurrentFragment;
+        }
+    
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            if (getCurrentFragment() != object) {
+                mCurrentFragment = ((Fragment) object);
+            }
+            super.setPrimaryItem(container, position, object);
+        }
+        
+		public MyPagerAdapter(FragmentManager fm, Bundle aInitState) {
+			super(fm);
+			
+			mInitState = aInitState;
+		}
+
+		@Override
+		public Fragment getItem(int pos) {
+			switch(pos) {
+
+			case 0: return ExperimentParamsFragment.newInstance("android.mlh.cooking", mInitState);
+			case 1: return ExperimentResultsFragment.newInstance("SecondFragment, Instance 1");
+
+			default: return ExperimentResultsFragment.newInstance("FirstFragment, Instance 1");
+			}
+		}
+
+		@Override
+		public int getCount() {
+			return 2;
+		}       
 	}
 
 	private void setSaveButtonListener() {
@@ -91,13 +124,14 @@ public class ExperimentActivity extends Activity{
 		btn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
+				
 				try {
-					//PluginManager.getInstance().getCurrentPlugin().setExperiment(experiment);
-
-					Log.d("ExperimentActivity", "result set in plugin");
-
-					experiment = PluginManager.getInstance().getCurrentPlugin().getExperiment(captureState());
-
+					PluginManager.getInstance().getCurrentPlugin().setExperiment(experiment);
+					Log.d("ExperimentActivity", "experiment set");
+					Bundle currState = ((ExperimentParamsFragment) pageAdapter.getCurrentFragment()).captureState();
+					
+					experiment = PluginManager.getInstance().getCurrentPlugin().getExperiment(currState);
+					
 					if (experiment == null) {
 						Log.d("ExperimentActivity", "getExperiment() returned null");
 					} else {
@@ -124,7 +158,9 @@ public class ExperimentActivity extends Activity{
 
 				Log.d("ExperimentActivity", "Experiment added: " + experiment.toString());
 			}
+			
 		});
+		
 	}
 
 	/**
@@ -140,154 +176,5 @@ public class ExperimentActivity extends Activity{
 		});
 	}
 
-	private Bundle captureState() {
-		Bundle state = new Bundle();
-		ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-
-		captureState(parent, state);
-
-		return state;
-	}
-
-	private void captureState(ViewGroup parent, Bundle state) {
-		for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-			View v = parent.getChildAt( i );
-			if( v instanceof ViewGroup ) 
-				captureState( (ViewGroup)v, state );
-			else
-				if( v instanceof TextView ) {
-					TextView e = (TextView)v;
-					int id = e.getId() - idOffset;
-					Log.d(LOG_D, "tv id = " + e.getId());
-					state.putString( Integer.toString(id), e.getText().toString() );
-				}
-		}        
-	}
-
-	/**
-	 * Populates the field of the Experiment form
-	 * with the bundle received from the current plugin.
-	 */
-	private void populateExperimentForm(Bundle state) {
-		Log.d(LOG_D, "populating experiment form from " + state);
-
-		for (String key: state.keySet()) {
-			//TextView tv = (TextView) findViewById(Integer.getInteger(key) + idOffset);
-			int viewID = Integer.parseInt(key) + idOffset;
-
-			Log.d(LOG_D, "key = " + viewID + ", value = " + state.getString(key));
-			TextView tv = (TextView) findViewById(viewID);
-
-			tv.setText(state.getString(key));
-		}     
-	}
-
-	private void registerButtonListener() {
-		ViewGroup parentView = (ViewGroup)findViewById( R.id.expLL );
-
-		registerButtonListener( parentView, listener);
-	}
-
-	private void registerButtonListener(ViewGroup parent, View.OnClickListener listener) {
-		for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-			View v = parent.getChildAt(i);
-			if( v instanceof ViewGroup ) 
-				registerButtonListener( (ViewGroup)v, listener );
-			else
-				if( v instanceof Button ) {
-					Button b = (Button)v;
-					b.setOnClickListener( listener );
-				}
-		}
-	}
-
-	private void inflateToView( 
-
-			) {
-		try {
-			String packageName = "android.mlh.cooking";
-			ApplicationInfo info = getPackageManager().getApplicationInfo( packageName, 0 );
-
-			Resources res = getPackageManager().getResourcesForApplication( info );
-			XmlResourceParser xres = res.getLayout( 0x7f030000 );
-
-			ViewGroup parentView = (ViewGroup)findViewById( R.id.expLL );
-			parentView.removeAllViews();
-
-			View view = inflater.inflate( xres, parentView );
-
-			adjustSubViewIds( parentView);
-		} catch( NameNotFoundException ex ) {
-			//Log.e( LOG_TAG, "NameNotFoundException", ex );
-		}
-	}
-
-	class OnClickListenerProxy implements View.OnClickListener {
-		public void onClick( View v ) {
-			int id = v.getId() - idOffset;
-
-			if( PluginManager.getInstance().getCurrentPlugin() != null ) {
-				ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-				Bundle state = new Bundle();
-				captureState(parent, state);
-				Bundle result = null;
-
-				try {
-					result = PluginManager.getInstance().getCurrentPlugin().onClick( id,state );
-				} catch( RemoteException ex ) {
-
-				}
-
-				if( result != null ) {
-
-					Log.d("result", "not null");
-					applyUpdates(result);
-
-				} else {
-					Log.d("result", "null");
-				}
-			}
-		}
-
-
-
-	}
-
-	private void adjustSubViewIds( ViewGroup parent ) {
-		for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-			View v = parent.getChildAt( i );
-			if( v instanceof ViewGroup ) 
-				adjustSubViewIds( (ViewGroup)v);
-			else {
-				int id = v.getId();
-				if( id != View.NO_ID )
-					v.setId( id+idOffset );
-			}
-		}
-	}
-
-
-
-	private void applyUpdates(Bundle update) {
-		ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-		applyUpdates(parent, update );		
-	}
-
-	private void applyUpdates( ViewGroup parent, Bundle update ) {
-		for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-			View v = parent.getChildAt( i );
-			if( v instanceof ViewGroup ) 
-				applyUpdates( (ViewGroup)v, update );
-			else
-				if( v instanceof TextView ) {
-					TextView tv = (TextView)v;
-					int id = tv.getId() - idOffset;
-					if( id != View.NO_ID ) {
-						String updateObj = update.getString( Integer.toString( id ) );
-						if( updateObj != null )
-							tv.setText( updateObj );
-					}
-				}
-		}        		
-	}
+	
 }

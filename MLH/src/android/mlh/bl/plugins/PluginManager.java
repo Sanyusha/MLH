@@ -18,6 +18,7 @@ public class PluginManager {
 	private HashMap<String, IMLHPlugin> plugins;
 	
 	private String currPluginName;
+	private String currService;
 	
 	private PluginManager() {
 		plugins = new HashMap<String, IMLHPlugin>();
@@ -46,6 +47,14 @@ public class PluginManager {
 	
 	public IMLHPlugin getCurrentPlugin() {
 		return plugins.get(currPluginName);
+	}
+	
+	public void setCurrentService(String service) {
+		currService = service;
+	}
+	
+	public String getCurrentService() {
+		return currService;
 	}
 	
 	public List<HashMap<String,String>> getServices() {
