@@ -2,19 +2,19 @@ package android.mlh.ui;
 
 import java.io.IOException;
 
-import android.app.Activity;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
 import android.mlh.aidl.Experiment;
 import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
+import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,200 +23,158 @@ import android.widget.Toast;
 
 import com.example.mlh.R;
 
-public class ExperimentActivity extends Activity{
+public class ExperimentActivity extends FragmentActivity{
+	private Experiment experiment;
+	private int currExperiment;
+	private MyPagerAdapter pageAdapter;
 	
-	private LayoutInflater inflater;
-	int idOffset = 100;
-	private OnClickListenerProxy listener;
-	
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_experiment);
-        
-        inflater = LayoutInflater.from( this );
-        listener = new OnClickListenerProxy();
-        TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-        
-        try {
+	private final static String LOG_D = "ExperimentListActivity";
+
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_experiment);
+
+		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+
+		if (PluginManager.getInstance().getCurrentPlugin() == null) {
+			Log.d(LOG_D, "current plugin not selected");
+			txtTitle.setText("current plugin not selected");
+			return;
+		}
+
+		try {
 			txtTitle.setText(PluginManager.getInstance().getCurrentPlugin().getPluginType());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-        inflateToView();
-        
-        registerButtonListener();
-        
-        setSaveButtonListener();
-    }
-    
-    private void setSaveButtonListener() {
-    	Button btn = (Button) findViewById(R.id.btnSave);
-    	
-    	btn.setOnClickListener(new View.OnClickListener() {
+		
+		setSaveButtonListener();
+		
+		setCancelButtonListener();
+
+		currExperiment = TaskManager.getInstance().getCurrentTask().getCurrentExperiment();
+		
+		Bundle state = new Bundle();
+		
+		if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
+			experiment = new Experiment();
+		} else {
+			experiment = TaskManager.getInstance().getCurrentTask().getExperiments().get(currExperiment);
 			
+			try {
+				state = PluginManager.getInstance().getCurrentPlugin().getState(experiment);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
+		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state);
+		pager.setAdapter(pageAdapter);
+		
+		//captureState();
+
+		//TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
+	}
+
+	private class MyPagerAdapter extends FragmentPagerAdapter {
+		private Fragment mCurrentFragment;
+		private Bundle mInitState;
+		
+        public Fragment getCurrentFragment() {
+            return mCurrentFragment;
+        }
+    
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            if (getCurrentFragment() != object) {
+                mCurrentFragment = ((Fragment) object);
+            }
+            super.setPrimaryItem(container, position, object);
+        }
+        
+		public MyPagerAdapter(FragmentManager fm, Bundle aInitState) {
+			super(fm);
+			
+			mInitState = aInitState;
+		}
+
+		@Override
+		public Fragment getItem(int pos) {
+			switch(pos) {
+
+			case 0: return ExperimentParamsFragment.newInstance("android.mlh.cooking", mInitState);
+			case 1: return ExperimentResultsFragment.newInstance("SecondFragment, Instance 1");
+
+			default: return ExperimentResultsFragment.newInstance("FirstFragment, Instance 1");
+			}
+		}
+
+		@Override
+		public int getCount() {
+			return 2;
+		}       
+	}
+
+	private void setSaveButtonListener() {
+		Button btn = (Button) findViewById(R.id.btnSave);
+
+		btn.setOnClickListener(new View.OnClickListener() {
+
 			public void onClick(View v) {
-				Experiment result = new Experiment();
 				
 				try {
-					PluginManager.getInstance().getCurrentPlugin().setExperiment(result);
+					PluginManager.getInstance().getCurrentPlugin().setExperiment(experiment);
+					Log.d("ExperimentActivity", "experiment set");
+					Bundle currState = ((ExperimentParamsFragment) pageAdapter.getCurrentFragment()).captureState();
 					
-					Log.d("ExperimentActivity", "result set in plugin");
+					experiment = PluginManager.getInstance().getCurrentPlugin().getExperiment(currState);
 					
-					result = PluginManager.getInstance().getCurrentPlugin().getExperiment(captureState());
-					
-					TaskManager.getInstance().getCurrentTask().addExperiment(result);
-					
-					FileManager.getInstance(getApplicationContext()).saveTask(TaskManager.getInstance().getCurrentTask());
-					if (result == null) {
+					if (experiment == null) {
 						Log.d("ExperimentActivity", "getExperiment() returned null");
 					} else {
-						Log.d("ExperimentActivity", "getExperiment() returned result");
+						if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
+							TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
+							currExperiment = TaskManager.getInstance().getCurrentTask().getExperiments().size() - 1;
+
+							TaskManager.getInstance().getCurrentTask().setCurrentExperiment(currExperiment);
+						} else {
+							TaskManager.getInstance().getCurrentTask().getExperiments().set(currExperiment, experiment);
+						}
+
+						FileManager.getInstance(getApplicationContext()).saveTask(TaskManager.getInstance().getCurrentTask());
+
+						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
 					}
-					
+
 				} catch (RemoteException e) {
 					Log.d("ExperimentActivity", e.getMessage());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				Log.d("ExperimentActivity", "Experiment added: " + result.toString());
+
+				Log.d("ExperimentActivity", "Experiment added: " + experiment.toString());
+			}
+			
+		});
+		
+	}
+
+	/**
+	 * The current behavior of the cancel button is identical to Android back button
+	 */
+	private void setCancelButtonListener() {
+		Button btn = (Button) findViewById(R.id.btnCancel);
+
+		btn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				onBackPressed();
 			}
 		});
-    }
-    
-    private Bundle captureState() {
-    	Bundle state = new Bundle();
-		ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-		
-		captureState(parent, state);
-		
-		return state;
-    }
-    
-    private void captureState(ViewGroup parent, Bundle state) {
-        for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-            View v = parent.getChildAt( i );
-            if( v instanceof ViewGroup ) 
-                captureState( (ViewGroup)v, state );
-            else
-            if( v instanceof TextView ) {
-                TextView e = (TextView)v;
-                int id = e.getId() - idOffset;
-                state.putString( Integer.toString(id), e.getText().toString() );
-            }
-        }        
-    }
-    private void registerButtonListener() {
-    	ViewGroup parentView = (ViewGroup)findViewById( R.id.expLL );
-    	
-        registerButtonListener( parentView, listener);
-    }
-
-    private void registerButtonListener(ViewGroup parent, View.OnClickListener listener) {
-        for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-            View v = parent.getChildAt(i);
-            if( v instanceof ViewGroup ) 
-                registerButtonListener( (ViewGroup)v, listener );
-            else
-            if( v instanceof Button ) {
-                Button b = (Button)v;
-                b.setOnClickListener( listener );
-            }
-        }
-    }
-    
-    private void inflateToView( 
-            
-             ) {
-		try {
-			String packageName = "android.mlh.cooking";
-		ApplicationInfo info = getPackageManager().getApplicationInfo( packageName, 0 );
-		
-		Resources res = getPackageManager().getResourcesForApplication( info );
-		XmlResourceParser xres = res.getLayout( 0x7f030000 );
-		
-		ViewGroup parentView = (ViewGroup)findViewById( R.id.expLL );
-		parentView.removeAllViews();
-		
-		View view = inflater.inflate( xres, parentView );
-		
-		adjustSubViewIds( parentView);
-		} catch( NameNotFoundException ex ) {
-		//Log.e( LOG_TAG, "NameNotFoundException", ex );
-		}
-	}
-    
-    class OnClickListenerProxy implements View.OnClickListener {
-        public void onClick( View v ) {
-        	int id = v.getId() - idOffset;
-        	
-            if( PluginManager.getInstance().getCurrentPlugin() != null ) {
-            	ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-            	Bundle state = new Bundle();
-				captureState(parent, state);
-				Bundle result = null;
-				
-                try {
-                    result = PluginManager.getInstance().getCurrentPlugin().onClick( id,state );
-                } catch( RemoteException ex ) {
-                    
-                }
-				
-                
-                
-				if( result != null ) {
-					
-						Log.d("result", "not null");
-						applyUpdates(result);
-					
-				} else {
-					Log.d("result", "null");
-				}
-			}
-        }
-
-        
-        
-    }
-    
-    private void adjustSubViewIds( ViewGroup parent ) {
-        for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-            View v = parent.getChildAt( i );
-            if( v instanceof ViewGroup ) 
-                adjustSubViewIds( (ViewGroup)v);
-            else {
-                int id = v.getId();
-                if( id != View.NO_ID )
-                    v.setId( id+idOffset );
-            }
-        }
-    }
-    
-    
-    
-    private void applyUpdates(Bundle update) {
-    	ViewGroup parent = (ViewGroup)findViewById( R.id.expLL );
-		applyUpdates(parent, update );		
 	}
 
-	private void applyUpdates( ViewGroup parent, Bundle update ) {
-        for( int i = 0 ; i < parent.getChildCount() ; ++i ) {
-            View v = parent.getChildAt( i );
-            if( v instanceof ViewGroup ) 
-                applyUpdates( (ViewGroup)v, update );
-            else
-            if( v instanceof TextView ) {
-                TextView tv = (TextView)v;
-				int id = tv.getId() - idOffset;
-				if( id != View.NO_ID ) {
-					String updateObj = update.getString( Integer.toString( id ) );
-					if( updateObj != null )
-						tv.setText( updateObj );
-				}
-            }
-        }        		
-	}
+	
 }

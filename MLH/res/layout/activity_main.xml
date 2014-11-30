@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     >
-	
+
     <Button
         android:id="@+id/btn_new_task"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="59dp"
-        android:text="@string/create_new_task" />
-    
-  <ListView android:id="@+id/android:list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+        android:layout_height="wrap_content"
+        android:text="@string/create_new_task"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp" 
+        style="@style/SimpleButton"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="5dp"
+        android:background="@android:color/background_light" />
+
+    <ListView
+        android:id="@+id/android:list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="5dp" />
 
 </LinearLayout>

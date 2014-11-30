@@ -10,4 +10,6 @@ interface IMLHPlugin {
   Experiment getExperiment(in Bundle state);
   
   void setExperiment(in Experiment experiment);
+  
+  Bundle getState(in Experiment experiment);
 }

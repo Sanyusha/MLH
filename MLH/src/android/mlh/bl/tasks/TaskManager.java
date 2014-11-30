@@ -1,5 +1,7 @@
 package android.mlh.bl.tasks;
 
+import android.mlh.aidl.Experiment;
+
 public class TaskManager {
 	
 	private static TaskManager _instance = null;
