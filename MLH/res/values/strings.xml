@@ -8,15 +8,21 @@
     <string name="create_new_task">Create new task</string>
     <string name="new_task">New task</string>
     <string name="enter_task_name">Enter task name</string>
+    <string name="new_task_name">New task name</string>
     
-    <string name="experiment_list">Experiment list</string>
+    <string name="experiment_list">List of experiments</string>
+    <string name="task_list">List of tasks</string>
     
     <string name="create_new_experiment">Create new experiment</string>
 	<string name="main_no_items">No plugins</string>
 	<string name="plugin_type_not_exists">Plugin type does not exist</string>
 	<string name="no_connection_to_remote_interface">Can not connect to remote interface</string>
+	<string name="experiment_saved">Experiment saved</string>
 	
 	<string name="save">Save</string>
 	<string name="ok">OK</string>
+	<string name="delete">Delete</string>
+	<string name="edit">Edit</string>
 	<string name="cancel">Cancel</string>
+	
 </resources>

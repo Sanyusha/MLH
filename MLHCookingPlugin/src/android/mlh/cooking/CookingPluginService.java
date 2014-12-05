@@ -54,23 +54,33 @@ public class CookingPluginService extends Service {
 		
 		public void setExperiment(Experiment experiment) {
 			mExperiment = experiment;
-			Log.d("Plugin", "Sokol");
 		}
 		
 		public Experiment getExperiment(Bundle state) {
-			Experiment result = new Experiment();
+			Experiment result = mExperiment;
 			
-			result.setResult("55");
+			result.setResultScore("55");
+			
 			String o = state.getString(Integer.toString(R.id.edit1));
 			
-			if( o != null ) {
+			if( o != null && o.length() > 0) {
 				result.addParameter(GENERAL_TEXT, o);
-				result.setResult("100");
-			} else {
-				result.setResult("55");
+				result.setResultScore("100");
 			}
 			
 			return result;
+		}
+		
+		public Bundle getState(Experiment experiment) {
+			Bundle state = new Bundle();
+			
+			if (experiment != null) {
+				state.putString(Integer.toString(R.id.edit1), experiment.getParameter(GENERAL_TEXT));
+			} else {
+				state.putString(Integer.toString(R.id.edit1), "null");
+			}
+			
+			return state;
 		}
     };
 }
