@@ -316,15 +316,16 @@ public class MainActivity extends ListActivity {
 		private String serviceName;
 
 		public PluginServiceConnection(int serviceID) {
-			//this.serviceID = serviceID;
+			//I took the packageName of the plugin as 
+			//the identifier for the plugin in the PluginManager
 			this.serviceName = PluginManager.getInstance().getServices()
-					.get(serviceID).get(UIConstatns.ITEM_VALUE);
+					.get(serviceID).get(UIConstatns.ITEM_KEY);
 		}
 
 		public void onServiceConnected(ComponentName className, 
 				IBinder boundService ) {
 
-			Log.d("NewTaskActivity", "service <" + serviceName + "> connected");
+			Log.d(LOG_D, "service <" + serviceName + "> connected");
 
 			PluginManager.getInstance().addPlugin(serviceName, 
 					IMLHPlugin.Stub.asInterface((IBinder)boundService));
