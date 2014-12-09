@@ -82,6 +82,13 @@ public class CookingPluginService extends Service {
 			
 			return state;
 		}
+
+		@Override
+		public String[] getResultNames() throws RemoteException {
+			String[] retValue = {"Tasty", "Cheap", "Quick"};
+			
+			return retValue;
+		}
     };
 }
 

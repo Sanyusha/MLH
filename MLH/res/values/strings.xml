@@ -19,6 +19,7 @@
 	<string name="no_connection_to_remote_interface">Can not connect to remote interface</string>
 	<string name="experiment_saved">Experiment saved</string>
 	
+	<string name="result_score">Result score</string>
 	<string name="save">Save</string>
 	<string name="ok">OK</string>
 	<string name="delete">Delete</string>

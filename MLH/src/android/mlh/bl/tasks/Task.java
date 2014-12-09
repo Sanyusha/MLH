@@ -2,7 +2,9 @@ package android.mlh.bl.tasks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 import android.mlh.aidl.Experiment;
 
 /**
@@ -15,7 +17,7 @@ public class Task implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private String mName, mType, mPluginKey;
 	private List<Experiment> mExperiments;
-	
+	private HashMap<String, String> mResultPriorities;
 	/** When we choose the task, we change it to the number (index in MainActivity.savedTasks arrayList)*/
 	private int mCurrExperiment = -1;
 	
