@@ -1,4 +1,4 @@
-package android.mlh.utils.constants;
+package android.mlh.constants;
 
 public class FileConstatns {
 	public static final String TASK_FILE_NAME_PREFIX = "mlh_task_";

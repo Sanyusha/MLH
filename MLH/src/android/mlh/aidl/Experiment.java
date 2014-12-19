@@ -7,6 +7,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+/** A simple container that holds information about a single experiment.
+ *  It is also Parcelable, so it can be passed to an Android Service.
+ * As a part of Task instance, it is Serializable as well.
+ */
 public final class Experiment implements Parcelable, Serializable {
     
 	private static final long serialVersionUID = 1L;
