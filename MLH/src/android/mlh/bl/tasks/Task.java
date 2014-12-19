@@ -2,7 +2,9 @@ package android.mlh.bl.tasks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 import android.mlh.aidl.Experiment;
 
 /**
@@ -28,6 +30,10 @@ public class Task implements Serializable{
 	 *  This value is -1 by default/when no Experiment is selected.
 	 */
 	private int mCurrExperiment = -1;
+
+	private HashMap<String, String> mResultPriorities;
+	/** When we choose the task, we change it to the number (index in MainActivity.savedTasks arrayList)*/
+
 	
 	public static final int CURRENT_EXPERIMENT_NOT_DEFINED = -1;
 	

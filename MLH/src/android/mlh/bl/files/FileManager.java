@@ -26,6 +26,8 @@ import android.util.Log;
  */
 public class FileManager {
 	
+	private static final String LOG_D = "FileManager";
+	
 	/** FileManager instance - only one*/
 	private static FileManager _instance = null;
 	
@@ -53,12 +55,16 @@ public class FileManager {
 		String filename = FileConstatns.TASK_FILE_NAME_PREFIX + task.getName() + 
 				FileConstatns.OBJECT_FILE_NAME_EXT;
 		
+		Log.d(LOG_D, "Trying to save file: " + filename);
+		
 		FileOutputStream fileOut;
 
 		fileOut = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		
         out.writeObject(task);
+        
+        Log.d(LOG_D, "File saved: " + filename);
         
         out.close();
         fileOut.close();

@@ -56,6 +56,7 @@ public class ExperimentActivity extends FragmentActivity{
 		currExperiment = TaskManager.getInstance().getCurrentTask().getCurrentExperiment();
 		
 		Bundle state = new Bundle();
+		String[] results = {};
 		
 		if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			experiment = new Experiment();
@@ -64,6 +65,7 @@ public class ExperimentActivity extends FragmentActivity{
 			
 			try {
 				state = PluginManager.getInstance().getCurrentPlugin().getState(experiment);
+				results = PluginManager.getInstance().getCurrentPlugin().getResultNames();
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -71,17 +73,25 @@ public class ExperimentActivity extends FragmentActivity{
 		}
 		
 		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
-		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state);
+		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state, results);
 		pager.setAdapter(pageAdapter);
 		
 		//captureState();
 
 		//TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
+		
+		updateResultScore();
 	}
-
+	
+	private void updateResultScore() {
+		TextView tv = (TextView) findViewById(R.id.txtScore);
+		tv.setText(experiment.getResultScore());
+	}
+	
 	private class MyPagerAdapter extends FragmentPagerAdapter {
 		private Fragment mCurrentFragment;
 		private Bundle mInitState;
+		private String[] mResults;
 		
         public Fragment getCurrentFragment() {
             return mCurrentFragment;
@@ -95,20 +105,22 @@ public class ExperimentActivity extends FragmentActivity{
             super.setPrimaryItem(container, position, object);
         }
         
-		public MyPagerAdapter(FragmentManager fm, Bundle aInitState) {
+		public MyPagerAdapter(FragmentManager fm, Bundle aInitState, String[] results) {
 			super(fm);
 			
 			mInitState = aInitState;
+			mResults = results;
 		}
 
 		@Override
 		public Fragment getItem(int pos) {
 			switch(pos) {
 
-			case 0: return ExperimentParamsFragment.newInstance("android.mlh.cooking", mInitState);
-			case 1: return ExperimentResultsFragment.newInstance("SecondFragment, Instance 1");
+			case 0: return ExperimentParamsFragment.newInstance(
+					PluginManager.getInstance().getCurrentPluginName(), mInitState);
+			case 1: return ExperimentResultsFragment.newInstance(mResults);
 
-			default: return ExperimentResultsFragment.newInstance("FirstFragment, Instance 1");
+			default: return ExperimentResultsFragment.newInstance(mResults);
 			}
 		}
 
@@ -147,6 +159,8 @@ public class ExperimentActivity extends FragmentActivity{
 						FileManager.getInstance(getApplicationContext()).saveTask(TaskManager.getInstance().getCurrentTask());
 
 						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
+						
+						updateResultScore();
 					}
 
 				} catch (RemoteException e) {

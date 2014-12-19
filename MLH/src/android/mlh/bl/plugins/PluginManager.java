@@ -69,6 +69,11 @@ public class PluginManager {
 		return plugins.get(currPluginName);
 	}
 	
+
+	public String getCurrentPluginName() {
+		return currPluginName;
+	}
+	
 	/**
 	 * 
 	 * @param service
