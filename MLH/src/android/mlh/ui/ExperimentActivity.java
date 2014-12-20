@@ -23,6 +23,9 @@ import android.widget.Toast;
 
 import com.example.mlh.R;
 
+/**
+ * 
+ */
 public class ExperimentActivity extends FragmentActivity{
 	private Experiment experiment;
 	private int currExperiment;

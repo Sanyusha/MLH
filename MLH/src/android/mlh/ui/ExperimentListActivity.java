@@ -1,9 +1,12 @@
 package android.mlh.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.mlh.aidl.Experiment;
 import android.mlh.bl.files.FileManager;
@@ -14,9 +17,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.example.mlh.R;
 
@@ -56,6 +64,8 @@ public class ExperimentListActivity extends ListActivity {
 				startActivity(intent);
 			}
 		});
+		
+		setOnListItemLongClick();
 	}
 	
 	private void fillSavedExperiments() {
@@ -91,5 +101,79 @@ public class ExperimentListActivity extends ListActivity {
 		Intent intent = new Intent(this, ExperimentActivity.class);
 
 		startActivity(intent);
+	}
+	
+	
+	private void setOnListItemLongClick() {
+		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				final TextView tv = (TextView) view.findViewById(R.id.text1);
+				final int pos = position;
+				TaskManager.getInstance().getCurrentTask().setCurrentExperiment(position);
+
+				// build a list dialog
+				AlertDialog.Builder builderSingle = new AlertDialog.Builder(ExperimentListActivity.this);
+
+				builderSingle.setTitle(tv.getText());
+
+				final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+						ExperimentListActivity.this,
+						android.R.layout.select_dialog_item);
+
+				arrayAdapter.add(getString(R.string.edit));
+				arrayAdapter.add(getString(R.string.delete));
+
+				builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						String strName = arrayAdapter.getItem(which);
+
+						if (strName.equalsIgnoreCase(getString(R.string.delete))) {
+							try {
+								
+								//From selected task delete selected experiment, set experiment selected to -1
+								Task currentTask = TaskManager.getInstance().getCurrentTask();
+								currentTask.deleteExperiment(currentTask.getCurrentExperiment());
+								currentTask.setCurrentExperiment(Task.CURRENT_EXPERIMENT_NOT_DEFINED);
+								FileManager.getInstance(getApplicationContext()).saveTask(currentTask);
+								itemAdapter.notifyDataSetChanged();
+								fillSavedExperiments();
+
+								Log.d(LOG_D, "The task <" + tv.getText().toString() + "> removed");
+
+							} catch (IOException e) {
+								Log.d(LOG_D, e.getMessage());
+							}
+						}
+
+						if (strName.equalsIgnoreCase(getString(R.string.edit))) {
+							dialog.dismiss();
+
+
+							
+							
+							Log.d(LOG_D, "Current task has " + 
+									TaskManager.getInstance().getCurrentTask().getExperiments().size() +
+									" experiments, selected: " + pos);
+							
+							Intent intent = new Intent(ExperimentListActivity.this, ExperimentActivity.class);
+
+							startActivity(intent);
+						
+						}
+					}
+				});
+
+				builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				builderSingle.show();
+
+				return true;
+			}
+		});
 	}
 }
