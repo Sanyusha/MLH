@@ -33,7 +33,8 @@
         
         <activity
             android:name="android.mlh.ui.ExperimentActivity"
-            android:label="@string/create_new_experiment" >
+            android:label="@string/create_new_experiment" 
+            android:windowSoftInputMode="adjustResize">
         </activity>
         
         <activity
