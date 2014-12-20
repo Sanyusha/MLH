@@ -26,4 +26,6 @@
 	<string name="edit">Edit</string>
 	<string name="cancel">Cancel</string>
 	
+	<string name="err_current_plugin">Current plugin not selected</string>
+	<string name="err_plugin_connection">Plugin connection error</string>
 </resources>
