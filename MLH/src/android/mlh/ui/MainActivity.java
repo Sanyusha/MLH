@@ -170,10 +170,10 @@ public class MainActivity extends ListActivity {
 
 	private void setOnListItemLongClick() {
 		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				final TextView tv = (TextView) arg1.findViewById(R.id.text1);
-				final int pos = arg2;
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				final TextView tv = (TextView) view.findViewById(R.id.text1);
+				final int pos = position;
 
 				// build a list dialog
 				AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);

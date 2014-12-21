@@ -1,7 +1,12 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="TitleFont" parent="@android:style/TextAppearance.Medium">
         <item name="android:typeface">monospace</item>
         <item name="android:layout_margin">5dp</item>
+    </style>
+    
+    <style name="SubTitleFont" parent="@android:style/TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
+        <item name="android:layout_margin">4dp</item>
     </style>
     
     <style name="Button" parent="@android:style/TextAppearance.Widget.Button">

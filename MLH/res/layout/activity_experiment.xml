@@ -8,6 +8,11 @@
         android:id="@+id/txtTitle"
         style="@style/TitleFont"
         android:layout_width="match_parent"
+        android:layout_height="35dp" />
+    
+    <TextView
+        android:id="@+id/txtTaskName"
+        style="@style/SubTitleFont"
         android:layout_height="40dp"
         android:textColor="#A52A2A" />
 

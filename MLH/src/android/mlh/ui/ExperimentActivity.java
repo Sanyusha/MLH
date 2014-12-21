@@ -35,6 +35,7 @@ public class ExperimentActivity extends FragmentActivity{
 		setContentView(R.layout.activity_experiment);
 
 		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
 
 		if (PluginManager.getInstance().getCurrentPlugin() == null) {
 			Log.d(LOG_D, "current plugin not selected");
@@ -48,6 +49,8 @@ public class ExperimentActivity extends FragmentActivity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		txtTaskName.setText(TaskManager.getInstance().getCurrentTask().getName());
 		
 		setSaveButtonListener();
 		
@@ -161,6 +164,8 @@ public class ExperimentActivity extends FragmentActivity{
 						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
 						
 						updateResultScore();
+						
+						finish();
 					}
 
 				} catch (RemoteException e) {
