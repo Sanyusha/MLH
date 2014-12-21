@@ -40,8 +40,21 @@ import android.widget.Toast;
 
 import com.example.mlh.R;
 
+
+/**
+ * This is the main activity. 
+ * @author everyone
+ *
+ */
 public class MainActivity extends ListActivity {
+	
+	/** It is adapter from data structure to the view (XML)*/
 	private SimpleAdapter itemAdapter;
+	
+	/** List of all tasks. Maps filenames to file paths.
+	 * Each element in the list represents a task.
+	 * The element maps filename of serialized Task instance to a path to that file 
+	 */
 	private ArrayList<HashMap<String,String>> savedTasks = new ArrayList<HashMap<String,String>>();
 
 	private ArrayList<PluginServiceConnection> pluginServiceConnection = 
@@ -80,6 +93,11 @@ public class MainActivity extends ListActivity {
 		packageFilter.addDataScheme( "package" );
 	}
 
+	/**
+	 * Provide the cursor for the list view (UI)
+	 * Basically adds the list of tasks to our view. 
+	 * Like updating XML view, but from a data structure.
+	 */
 	private void setListAdapter() {
 		fillSavedTasks();
 
@@ -95,7 +113,7 @@ public class MainActivity extends ListActivity {
 	}
 
 	/**
-	 * Fill the list of user saved tasks.
+	 * Fill the this.savedTasks field - the list of Tasks.
 	 * These tasks are shown in the activity list.
 	 */
 	private void fillSavedTasks() {
@@ -103,7 +121,7 @@ public class MainActivity extends ListActivity {
 
 		for (String el: FileManager.getInstance(getApplicationContext()).getSavedTasks()) {
 			HashMap<String,String> item = new HashMap<String,String>();
-			item.put(UIConstatns.ITEM_KEY, el);
+			item.put(UIConstatns.ITEM_KEY, el);// el - filename , value - path to file
 			item.put(UIConstatns.ITEM_VALUE, FileManager.getInstance(getApplicationContext()).getTaskPath(el));
 
 			savedTasks.add( item );
@@ -316,15 +334,16 @@ public class MainActivity extends ListActivity {
 		private String serviceName;
 
 		public PluginServiceConnection(int serviceID) {
-			//this.serviceID = serviceID;
+			//I took the packageName of the plugin as 
+			//the identifier for the plugin in the PluginManager
 			this.serviceName = PluginManager.getInstance().getServices()
-					.get(serviceID).get(UIConstatns.ITEM_VALUE);
+					.get(serviceID).get(UIConstatns.ITEM_KEY);
 		}
 
 		public void onServiceConnected(ComponentName className, 
 				IBinder boundService ) {
 
-			Log.d("NewTaskActivity", "service <" + serviceName + "> connected");
+			Log.d(LOG_D, "service <" + serviceName + "> connected");
 
 			PluginManager.getInstance().addPlugin(serviceName, 
 					IMLHPlugin.Stub.asInterface((IBinder)boundService));

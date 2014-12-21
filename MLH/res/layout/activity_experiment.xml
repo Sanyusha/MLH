@@ -13,8 +13,8 @@
     <TextView
         android:id="@+id/txtTaskName"
         style="@style/SubTitleFont"
-        android:layout_width="match_parent"
-        android:layout_height="30dp" />
+        android:layout_height="40dp"
+        android:textColor="#A52A2A" />
 
     <android.support.v4.view.ViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,6 +23,26 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal" >
+		
+        <TextView
+            style="@style/TitleFont"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:text="@string/result_score" />
+        
+        <TextView
+            android:id="@+id/txtScore"
+            style="@style/TitleFont"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="40dp" 
+            android:textColor="#00FF00"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

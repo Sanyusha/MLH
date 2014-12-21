@@ -49,6 +49,10 @@ public class PluginManager {
 		return plugins.get(currPluginName);
 	}
 	
+	public String getCurrentPluginName() {
+		return currPluginName;
+	}
+	
 	public void setCurrentService(String service) {
 		currService = service;
 	}

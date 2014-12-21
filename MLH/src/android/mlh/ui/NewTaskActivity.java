@@ -1,5 +1,7 @@
 package android.mlh.ui;
 
+import java.io.IOException;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -22,7 +24,7 @@ import com.example.mlh.R;
 
 public class NewTaskActivity extends ListActivity{
 
-	private static final String LOG_TAG = "NewTaskActivity";
+	private static final String LOG_D = "NewTaskActivity";
 	
 	private SimpleAdapter itemAdapter;
 
@@ -42,7 +44,7 @@ public class NewTaskActivity extends ListActivity{
 
 	protected void onListItemClick (ListView l, View v, int position, long id) {
 
-		final TextView tv = (TextView) v.findViewById(R.id.text2);
+		final TextView tv = (TextView) v.findViewById(R.id.text1);
 
 		PluginManager.getInstance().setCurrentPlugin(tv.getText().toString());
 
@@ -59,12 +61,14 @@ public class NewTaskActivity extends ListActivity{
 		alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String value = input.getText().toString();
-
+				
 				if (value != null && value.length() != 0) {
 					try {
+						Log.d(LOG_D, "currPlugin = " + PluginManager.getInstance().getCurrentPlugin());
+						
 						String taskType = PluginManager.getInstance().getCurrentPlugin().getPluginType();
 
-						Log.d("NewTaskActivity", "create and save task with name = <" +
+						Log.d(LOG_D, "create and save task with name = <" +
 								value + "> and type = <" + taskType + ">");
 
 						Task task = new Task(value, taskType, tv.getText().toString());
@@ -78,11 +82,10 @@ public class NewTaskActivity extends ListActivity{
 						startActivity(intent);
 
 					}
-					catch (RemoteException e) {
-
-					}
-					catch (Exception e) {
-						Log.d("NewTaskActivity", "failed to save task");
+					catch (IOException e) {
+						Log.d(LOG_D, "Failed to save task. " + e.getMessage());
+					} catch (RemoteException e) {
+						Log.d(LOG_D, "Remote interface exception. " + e.getMessage());
 					}
 				}
 			}

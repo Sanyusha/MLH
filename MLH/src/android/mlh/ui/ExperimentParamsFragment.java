@@ -61,6 +61,8 @@ public class ExperimentParamsFragment extends Fragment {
 	 */
 	private void inflateToView() {
 		try {
+			Log.d(LOG_D, PluginManager.getInstance().getCurrentPluginName());
+			
 			String packageName = mPackageName;
 			ApplicationInfo info = getActivity().getPackageManager().getApplicationInfo( packageName, 0 );
 

@@ -14,7 +14,16 @@ import android.mlh.bl.tasks.Task;
 import android.mlh.utils.constants.FileConstatns;
 import android.util.Log;
 
+/** 
+ * FileManger is used to serialize/de-serialize Task instances.
+ * File naming convention: TASK_FILE_NAME_PREFIX%taskName%OBJECT_FILE_NAME_EXT
+ * is used for serialization.
+ * PREFIX, EXT constants are defined in android.mlh.utils.constants.
+ * Also deletes Serialized Tasks from the storage.
+ */
 public class FileManager {
+	
+	private static final String LOG_D = "FileManager";
 	
 	private static FileManager _instance = null;
 	private Context mContext;
@@ -30,12 +39,16 @@ public class FileManager {
 		String filename = FileConstatns.TASK_FILE_NAME_PREFIX + task.getName() + 
 				FileConstatns.OBJECT_FILE_NAME_EXT;
 		
+		Log.d(LOG_D, "Trying to save file: " + filename);
+		
 		FileOutputStream fileOut;
 
 		fileOut = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		
         out.writeObject(task);
+        
+        Log.d(LOG_D, "File saved: " + filename);
         
         out.close();
         fileOut.close();
@@ -86,6 +99,14 @@ public class FileManager {
 		return mContext.getFilesDir();
 	}
 	
+	/**
+	 * Reads and returns list of files that 
+	 * - read list of files in task_dir 
+	 * - from these files filter ones that match TASK_FILE_NAME_PREFIX%name%OBJECT_FILE_NAME_EXT
+	 * - each file is a serialized task (e.g. list of Experiments)
+	 * - returns list of filenames (i.e. tasks)
+	 * @return 
+	 */
 	public List<String> getSavedTasks() {
 		ArrayList<String> savedTasks = new ArrayList<String>();
 		

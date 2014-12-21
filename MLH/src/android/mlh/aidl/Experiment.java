@@ -51,6 +51,10 @@ public final class Experiment implements Parcelable, Serializable {
     	mResultScore = resultScore;
     }
     
+    public String getResultScore() {
+    	return mResultScore;
+    }
+    
 	public String toString() {
 		return "Experiment [mParameters=" + mParameters + ", mResults=" +
 				mResults + ", mResultScore=" + mResultScore + "]";
