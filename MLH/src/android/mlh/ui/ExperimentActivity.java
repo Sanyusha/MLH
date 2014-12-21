@@ -151,7 +151,7 @@ public class ExperimentActivity extends FragmentActivity{
 
 						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
 						
-						finishActivity(0);
+						finish();
 					}
 
 				} catch (RemoteException e) {
