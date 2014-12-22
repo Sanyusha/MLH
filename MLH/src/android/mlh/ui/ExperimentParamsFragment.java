@@ -98,7 +98,9 @@ public class ExperimentParamsFragment extends Fragment {
 		return f;
 	}
 
-	public Bundle captureState() {
+	public Bundle captureParametersState() {
+		Log.d(LOG_D, "Capturing parameters state from fragment.");
+		
 		Bundle state = new Bundle();
 		ViewGroup parent = (ViewGroup) mView.findViewById(R.id.expLL);
 

@@ -1,5 +1,7 @@
 package android.mlh.cooking;
 
+import java.util.HashMap;
+
 import android.app.Service;
 import android.content.Intent;
 import android.mlh.aidl.Experiment;
@@ -15,6 +17,8 @@ public class CookingPluginService extends Service {
 	
 	static final String GENERAL_TEXT = "general_text";
 	
+	private static final String[] RESULT_NAMES = {"Tasty", "Cheap", "Quick"};
+	
 	public void onStart(Intent intent, int startId) {
 		super.onStart( intent, startId );
 	}
@@ -29,8 +33,6 @@ public class CookingPluginService extends Service {
 
     private final IMLHPlugin.Stub addBinder = 
 			new IMLHPlugin.Stub() {
-    	
-    	Experiment mExperiment;
     	
     	public String getPluginType() {
 			return PLUGIN_TYPE;
@@ -52,23 +54,16 @@ public class CookingPluginService extends Service {
 			return update;
 		}
 		
-		public void setExperiment(Experiment experiment) {
-			mExperiment = experiment;
-		}
-		
-		public Experiment getExperiment(Bundle state) {
-			Experiment result = mExperiment;
-			
-			result.setResultScore("55");
+		public Experiment updateExperimentParams(Bundle state, Experiment experiment) {
+			Experiment retValue = new Experiment();
 			
 			String o = state.getString(Integer.toString(R.id.edit1));
 			
 			if( o != null && o.length() > 0) {
-				result.addParameter(GENERAL_TEXT, o);
-				result.setResultScore("100");
+				retValue.addParameter(GENERAL_TEXT, o);
 			}
 			
-			return result;
+			return retValue;
 		}
 		
 		public Bundle getState(Experiment experiment) {
@@ -82,12 +77,9 @@ public class CookingPluginService extends Service {
 			
 			return state;
 		}
-
-		@Override
+		
 		public String[] getResultNames() throws RemoteException {
-			String[] retValue = {"Tasty", "Cheap", "Quick"};
-			
-			return retValue;
+			return RESULT_NAMES;
 		}
     };
 }

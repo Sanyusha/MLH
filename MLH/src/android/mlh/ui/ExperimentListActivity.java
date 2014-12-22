@@ -9,7 +9,7 @@ import android.mlh.aidl.Experiment;
 import android.mlh.bl.files.FileManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
-import android.mlh.ui.constants.UIConstatns;
+import android.mlh.constants.UIConstatns;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
