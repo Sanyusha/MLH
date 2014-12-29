@@ -165,7 +165,7 @@ public class ExperimentActivity extends FragmentActivity{
 						
 						updateResultScore();
 						
-						finish();
+						finishActivity(0);
 					}
 
 				} catch (RemoteException e) {
