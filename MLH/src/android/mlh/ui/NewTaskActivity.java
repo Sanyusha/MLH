@@ -10,7 +10,7 @@ import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
-import android.mlh.ui.constants.UIConstatns;
+import android.mlh.constants.UIConstatns;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -22,6 +22,12 @@ import android.widget.TextView;
 
 import com.example.mlh.R;
 
+/**
+ * This activity describes the way of adding new Task.
+ * 
+ * @author michael
+ *
+ */
 public class NewTaskActivity extends ListActivity{
 
 	private static final String LOG_D = "NewTaskActivity";

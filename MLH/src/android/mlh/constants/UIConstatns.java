@@ -1,4 +1,4 @@
-package android.mlh.ui.constants;
+package android.mlh.constants;
 
 public class UIConstatns {
 	public static final String ITEM_KEY = "item_key";
