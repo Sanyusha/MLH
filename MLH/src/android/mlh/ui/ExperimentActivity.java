@@ -58,12 +58,7 @@ public class ExperimentActivity extends FragmentActivity {
 		
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 
-<<<<<<< HEAD
-		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
-=======
 		setActivityTitle();
->>>>>>> 4d2dddc370360833adea3238613c55a817aaf2b3
 
 		setSaveButtonListener();
 
@@ -81,14 +76,6 @@ public class ExperimentActivity extends FragmentActivity {
 		} catch (RemoteException e) {
 			Log.e(LOG_D, "setActivityTitle: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
 		}
-<<<<<<< HEAD
-		
-		txtTaskName.setText(TaskManager.getInstance().getCurrentTask().getName());
-		
-		setSaveButtonListener();
-		
-		setCancelButtonListener();
-=======
 	}
 
 	/**
@@ -96,7 +83,6 @@ public class ExperimentActivity extends FragmentActivity {
 	 */
 	private void setExperiment() {
 		m_iCurrExperiment = m_CurrTask.getCurrentExperiment();
->>>>>>> 4d2dddc370360833adea3238613c55a817aaf2b3
 
 		Bundle state = new Bundle();
 
@@ -224,34 +210,7 @@ public class ExperimentActivity extends FragmentActivity {
 			public void onClick(View v) {
 
 				try {
-<<<<<<< HEAD
-					PluginManager.getInstance().getCurrentPlugin().setExperiment(experiment);
-					Log.d("ExperimentActivity", "experiment set");
-					Bundle currState = ((ExperimentParamsFragment) pageAdapter.getCurrentFragment()).captureState();
-					
-					experiment = PluginManager.getInstance().getCurrentPlugin().getExperiment(currState);
-					
-					if (experiment == null) {
-						Log.d("ExperimentActivity", "getExperiment() returned null");
-					} else {
-						if (currExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
-							TaskManager.getInstance().getCurrentTask().addExperiment(experiment);
-							currExperiment = TaskManager.getInstance().getCurrentTask().getExperiments().size() - 1;
 
-							TaskManager.getInstance().getCurrentTask().setCurrentExperiment(currExperiment);
-						} else {
-							TaskManager.getInstance().getCurrentTask().getExperiments().set(currExperiment, experiment);
-						}
-
-						FileManager.getInstance(getApplicationContext()).saveTask(TaskManager.getInstance().getCurrentTask());
-
-						Toast.makeText(getApplicationContext(), getString(R.string.experiment_saved), Toast.LENGTH_LONG).show();
-						
-						updateResultScore();
-						
-						finish();
-					}
-=======
 					updateExperimentParams();
 
 					updateExperimentResults();
@@ -265,7 +224,6 @@ public class ExperimentActivity extends FragmentActivity {
 							Toast.LENGTH_LONG).show();
 
 					Log.d(LOG_D, "Experiment added: " + m_CurrExperiment.toString());
->>>>>>> 4d2dddc370360833adea3238613c55a817aaf2b3
 
 				} catch (RemoteException e) {
 					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
