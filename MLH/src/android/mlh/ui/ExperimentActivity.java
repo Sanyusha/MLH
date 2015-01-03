@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,10 +57,14 @@ public class ExperimentActivity extends FragmentActivity {
 			finish();
 		}
 		
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams. SOFT_INPUT_STATE_ALWAYS_HIDDEN );
+		
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 
 		setActivityTitle();
-
+		
+		setTaskName();
+		
 		setSaveButtonListener();
 
 		setCancelButtonListener();
@@ -77,7 +82,14 @@ public class ExperimentActivity extends FragmentActivity {
 			Log.e(LOG_D, "setActivityTitle: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
 		}
 	}
+	
+	private void setTaskName() {
+		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
 
+		txtTaskName.setText(m_CurrTask.getName());
+		Log.d(LOG_D, "setTaskTitle: " + m_CurrTask.getName());
+	}
+	
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */

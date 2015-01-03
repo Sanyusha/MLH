@@ -14,6 +14,7 @@
         android:id="@+id/txtTaskName"
         style="@style/SubTitleFont"
         android:layout_height="40dp"
+        android:layout_width="wrap_content"
         android:textColor="#A52A2A" />
 
     <android.support.v4.view.ViewPager
