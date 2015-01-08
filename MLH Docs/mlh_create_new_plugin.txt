@@ -4,6 +4,7 @@ MLH: New plugin creation
 -------------------------
 
   - Create a new Android Application Project without activity.
+  
   - Open AndroidMannifest.xml. Add to it a service like as follows:
 		<service
             android:name="<YOUR_SERVICE_CLASS_NAME>"
@@ -13,5 +14,10 @@ MLH: New plugin creation
                 <category android:name="aexp.intent.category.ADD_PLUGIN" />
             </intent-filter>
         </service>
-	- Import the plugin package (android.mlh.aidl) into src folder
-	- Create a Java class for your sevice and implement the aidl interface from the imported package
+		
+	- Import the plugin package (android.mlh.aidl) into src folder.
+	
+	- Create a Java class for your sevice and implement the aidl interface from the imported package.
+	
+	- Create a layout for your experiment.
+		- Don't use string and other resources. Meanwhile everything should be hardcoded!
