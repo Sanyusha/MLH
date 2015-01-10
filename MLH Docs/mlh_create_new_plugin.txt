@@ -21,3 +21,4 @@ MLH: New plugin creation
 	
 	- Create a layout for your experiment.
 		- Don't use string and other resources. Meanwhile everything should be hardcoded!
+		- Use ScrollView on your layout.

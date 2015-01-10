@@ -1,40 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <TextView
-        android:id="@+id/lbl1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restaurant name" />
+        android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/txt1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/lbl2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Dish name" />
+            <LinearLayout
+                android:id="@+id/relativeLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/txt2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/txt1"
+                    android:layout_width="250dp"
+                    android:layout_height="50dp"
+                    android:hint="Enter restaurant name" />
 
-    <TextView
-        android:id="@+id/lbl3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Notes" />
+                <EditText
+                    android:id="@+id/txt2"
+                    android:layout_width="250dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter dish name" />
+            </LinearLayout>
 
-    <EditText
-        android:id="@+id/txt3"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-</LinearLayout>
+                <AnalogClock
+                    android:id="@+id/analogClock1"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp" 
+                    android:layout_marginTop="5dp"/>
+            </LinearLayout>
+
+            
+        </LinearLayout>
+        
+        <EditText
+                android:id="@+id/txt3"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="10dp"
+                android:hint="Enter your notes" />
+    </LinearLayout>
+
+</ScrollView>
