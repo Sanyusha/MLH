@@ -60,6 +60,18 @@ public class Task implements Serializable{
 	}
 	
 	/**
+	 * Removes Experiment from list of experiments.
+	 * If index is out of bounds - doesn't do anything.
+	 * @param index - index of experiment
+	 */
+	public void deleteExperiment(int index)
+	{
+		if(0 <= index && index < mExperiments.size())
+			mExperiments.remove(index);
+		
+	}
+	
+	/**
 	 * Get list of all Experiments associated with this task
 	 * @return list with all Experiments
 	 */

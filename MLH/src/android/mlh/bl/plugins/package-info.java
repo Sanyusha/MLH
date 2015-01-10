@@ -1,5 +1,5 @@
 /**
- * for working with plugins.
- * TODO: Add some actual description here.
+ * All the classes for managing services and Plugins.
+ * 
  */
 package android.mlh.bl.plugins;

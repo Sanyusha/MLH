@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.example.mlh.R;
 
 public class ExperimentActivity extends FragmentActivity {
-
 	/**
 	 * Current experiment that we are working on in the activity
 	 */
