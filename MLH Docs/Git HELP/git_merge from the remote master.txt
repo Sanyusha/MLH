@@ -1,0 +1,15 @@
+
+-------------------------------
+Merging from the remote master
+-------------------------------
+
+	- First commit your changes. Maybe you're also won't be allowed to make a merge without a commit. Anyway do it before the merge. 
+	Thus you will be sure that all your changes are saved.
+	
+	- Select Team->Merge and select "Remote Tracking"->origin/master.
+	
+	- In the merge option select "Commit (commit the result)".
+	
+	- If the automatic merge ended without conflicts you can continue to work.
+	
+	- Otherwise you need to locate all the files that are marked with red label and adjust them manually. After that you need to click on those files Team->Add to Index.
