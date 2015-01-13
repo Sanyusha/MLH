@@ -27,32 +27,34 @@ public class ExperimentParamsFragment extends Fragment {
 
 	private final static String LOG_D = "ExperimentParamsFragment";
 	private final static int idOffset = 100;
-	
+
 	private static ExperimentParamsFragment f;
-	
+
 	private LayoutInflater mInflater;
 	private OnClickListenerProxy listener;
 	private View mView;
 	private Bundle mInitState;
 	private String mPackageName;
-	
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mInflater = inflater;
 
-		mView = mInflater.inflate(R.layout.dummy, container, false);
-		
+		mView = mInflater.inflate(R.layout.fragment_experiment_params, container, false);
+
 		listener = new OnClickListenerProxy();
-		
+
+		/*
 		TextView tv = (TextView) mView.findViewById(R.id.textView1);
 		tv.setText("Params");
+		 */
 
 		inflateToView();
-		
+
 		registerButtonListener();
-		
+
 		populateExperimentForm(mInitState);
-		
+
 		return mView;
 	}
 
@@ -62,7 +64,7 @@ public class ExperimentParamsFragment extends Fragment {
 	private void inflateToView() {
 		try {
 			Log.d(LOG_D, PluginManager.getInstance().getCurrentPluginName());
-			
+
 			String packageName = mPackageName;
 			ApplicationInfo info = getActivity().getPackageManager().getApplicationInfo( packageName, 0 );
 
@@ -91,16 +93,16 @@ public class ExperimentParamsFragment extends Fragment {
 		if (f == null) {
 			f = new ExperimentParamsFragment();
 		}
-		
+
 		f.mInitState = aInitState;
 		f.mPackageName = aPackageName;
-		
+
 		return f;
 	}
 
 	public Bundle captureParametersState() {
 		Log.d(LOG_D, "Capturing parameters state from fragment.");
-		
+
 		Bundle state = new Bundle();
 		ViewGroup parent = (ViewGroup) mView.findViewById(R.id.expLL);
 
@@ -173,7 +175,7 @@ public class ExperimentParamsFragment extends Fragment {
 				}
 		}        		
 	}
-	
+
 	/**
 	 * Populates the field of the Experiment form
 	 * with the bundle received from the current plugin.

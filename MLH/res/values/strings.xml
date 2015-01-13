@@ -18,6 +18,7 @@
 	<string name="plugin_type_not_exists">Plugin type does not exist</string>
 	<string name="no_connection_to_remote_interface">Can not connect to remote interface</string>
 	<string name="experiment_saved">Experiment saved</string>
+	<string name="experiment.parameters">Experiment parameters</string>
 	
 	<string name="result_score">Result score</string>
 	<string name="save">Save</string>
