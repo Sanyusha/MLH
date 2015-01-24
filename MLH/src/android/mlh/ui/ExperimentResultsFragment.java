@@ -36,9 +36,6 @@ public class ExperimentResultsFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_experiment_results, container, false);
 
-		TextView tv = (TextView) v.findViewById(R.id.text1);
-		tv.setText("Results results results");
-		
 		Log.d(LOG_D, "onCreateView: experiment results are: " + m_Results);
 		
 		// You can't simply cast an Object[] array to a String[] array. 

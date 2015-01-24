@@ -40,7 +40,6 @@ import android.widget.Toast;
 
 import com.example.mlh.R;
 
-
 /**
  * This is the main activity. 
  * @author everyone
@@ -63,7 +62,7 @@ public class MainActivity extends ListActivity {
 	private PackageBroadcastReceiver packageBroadcastReceiver;
 	private IntentFilter packageFilter;
 
-	private final static String LOG_D = "MainActivity";
+	private final static String LOG_D = UIConstatns.LOG_PREFIX + "MainActivity";
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

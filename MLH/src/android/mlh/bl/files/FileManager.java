@@ -12,6 +12,7 @@ import java.util.List;
 import android.content.Context;
 import android.mlh.bl.tasks.Task;
 import android.mlh.constants.FileConstatns;
+import android.mlh.constants.UIConstatns;
 import android.util.Log;
 
 /** 
@@ -26,7 +27,7 @@ import android.util.Log;
  */
 public class FileManager {
 	
-	private static final String LOG_D = "FileManager";
+	private static final String LOG_D = UIConstatns.LOG_PREFIX + "FileManager";
 	
 	/** FileManager instance - only one*/
 	private static FileManager _instance = null;
@@ -55,7 +56,7 @@ public class FileManager {
 		String filename = FileConstatns.TASK_FILE_NAME_PREFIX + task.getName() + 
 				FileConstatns.OBJECT_FILE_NAME_EXT;
 		
-		Log.d(LOG_D, "Trying to save file: " + filename);
+		Log.d(LOG_D, "saveTask(): " + filename + " started");
 		
 		FileOutputStream fileOut;
 
@@ -64,9 +65,10 @@ public class FileManager {
 		
         out.writeObject(task);
         
-        Log.d(LOG_D, "File saved: " + filename);
+        Log.d(LOG_D, "saveTask(): " + filename + " completed");
         
         out.close();
+        
         fileOut.close();
 	}
 	
@@ -119,7 +121,7 @@ public class FileManager {
         File[] fileList = getTasksDir().listFiles();
 		
 		for(File file: fileList){
-			Log.d("FileManager", file.getAbsolutePath());
+			Log.d(LOG_D, "File found for <" + taskName + ">: " + file.getAbsolutePath());
 			
 			if (file.isFile() && 
 					(file.getName().endsWith(FileConstatns.OBJECT_FILE_NAME_EXT) 
@@ -129,7 +131,7 @@ public class FileManager {
 			}
 		}
 		
-		return "PATH NOT FOUND";
+		return null;
 	}
 	
 	/**

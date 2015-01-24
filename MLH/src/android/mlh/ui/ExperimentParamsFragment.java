@@ -44,11 +44,6 @@ public class ExperimentParamsFragment extends Fragment {
 
 		listener = new OnClickListenerProxy();
 
-		/*
-		TextView tv = (TextView) mView.findViewById(R.id.textView1);
-		tv.setText("Params");
-		 */
-
 		inflateToView();
 
 		registerButtonListener();

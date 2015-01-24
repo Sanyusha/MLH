@@ -41,29 +41,29 @@ public class ExperimentActivity extends FragmentActivity {
 	private MyPagerAdapter pageAdapter;
 
 	private final static String LOG_D = "ExperimentActivity";
-	
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment);
-		
+
 		Log.d(LOG_D, "Starting loading ExperimentActivity...");
-		
+
 		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
-		
+
 		// Current plugin existence validation.
 		if (m_CurrPlugin == null) {
 			Toast.makeText(this, getString(R.string.err_current_plugin), Toast.LENGTH_LONG).show();
 			finish();
 		}
-		
+
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams. SOFT_INPUT_STATE_ALWAYS_HIDDEN );
-		
+
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 
 		setActivityTitle();
-		
+
 		setTaskName();
-		
+
 		setSaveButtonListener();
 
 		setCancelButtonListener();
@@ -81,14 +81,14 @@ public class ExperimentActivity extends FragmentActivity {
 			Log.e(LOG_D, "setActivityTitle: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
 		}
 	}
-	
+
 	private void setTaskName() {
 		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
 
 		txtTaskName.setText(m_CurrTask.getName());
 		Log.d(LOG_D, "setTaskTitle: " + m_CurrTask.getName());
 	}
-	
+
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */
@@ -132,7 +132,7 @@ public class ExperimentActivity extends FragmentActivity {
 		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state,
 				results);
 		pager.setAdapter(pageAdapter);
-		
+
 		if (m_CurrExperiment.getResultScore() != null) {
 			TextView tv = (TextView) findViewById(R.id.txtScore);
 			tv.setText(m_CurrExperiment.getResultScore());
@@ -151,11 +151,11 @@ public class ExperimentActivity extends FragmentActivity {
 				+ results);
 
 		TextView tv = (TextView) findViewById(R.id.txtScore);
-		
+
 		String resScore = ScoreCalculation.calculate(results, resultPriorities);
-		
+
 		tv.setText(resScore);
-		
+
 		m_CurrExperiment.setResultScore(resScore);
 	}
 
@@ -173,6 +173,18 @@ public class ExperimentActivity extends FragmentActivity {
 
 		public Fragment getCurrentFragment() {
 			return mCurrentFragment;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			switch (position) {
+			case 0:
+				return getString(R.string.experiment_parameters);
+			case 1:
+				return getString(R.string.experiment_rate);
+			default:
+				return null;
+			}
 		}
 
 		@Override
@@ -245,6 +257,11 @@ public class ExperimentActivity extends FragmentActivity {
 		});
 	}
 
+	/**
+	 * Saves the current changes of the experiment in the current task that we are working with.
+	 * If the experiment is new and was just created we add it to the task.
+	 * @throws IOException
+	 */
 	private void updateCurrentTask() throws IOException {
 		if (m_iCurrExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			m_CurrTask.addExperiment(m_CurrExperiment);
@@ -252,18 +269,19 @@ public class ExperimentActivity extends FragmentActivity {
 			m_iCurrExperiment = m_CurrTask.getExperiments().size() - 1;
 
 			m_CurrTask.setCurrentExperiment(m_iCurrExperiment);
-
-			FileManager.getInstance(getApplicationContext()).saveTask(m_CurrTask);
 		}
+
+		// Now save the updated task on the file system.
+		FileManager.getInstance(getApplicationContext()).saveTask(m_CurrTask);
 	}
 
 	private void updateExperimentParams() throws RemoteException {
 		Bundle currState = pageAdapter.m_PF.captureParametersState();
 		Log.d(LOG_D, "Parameters state captured: " + currState);
 		Log.d(LOG_D, m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment).getParameters().toString());
-		
+
 		Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
-		
+
 		m_CurrExperiment.setParameters(updatedExperiment.getParameters());
 	}
 

@@ -5,14 +5,6 @@
     android:orientation="vertical"
     android:id="@+id/dummy" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/SubTitleFont"
-        android:layout_marginBottom="5dp"
-        android:text="@string/experiment.parameters" />
-
     <LinearLayout
         android:id="@+id/expLL"
         android:layout_width="match_parent"
