@@ -30,4 +30,6 @@
 	
 	<string name="err_current_plugin">Current plugin not selected</string>
 	<string name="err_plugin_connection">Plugin connection error</string>
+	
+	<string name="no_text">No text</string>
 </resources>

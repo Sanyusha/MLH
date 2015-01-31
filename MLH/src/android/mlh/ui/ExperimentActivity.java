@@ -60,10 +60,6 @@ public class ExperimentActivity extends FragmentActivity {
 
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 
-		setActivityTitle();
-
-		setTaskName();
-
 		setSaveButtonListener();
 
 		setCancelButtonListener();
@@ -71,23 +67,7 @@ public class ExperimentActivity extends FragmentActivity {
 		setExperiment();
 	}
 
-	private void setActivityTitle() {
-		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-
-		try {
-			txtTitle.setText(m_CurrPlugin.getPluginType());
-			Log.d(LOG_D, "setActivityTitle: " + m_CurrPlugin.getPluginType());
-		} catch (RemoteException e) {
-			Log.e(LOG_D, "setActivityTitle: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
-		}
-	}
-
-	private void setTaskName() {
-		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
-
-		txtTaskName.setText(m_CurrTask.getName());
-		Log.d(LOG_D, "setTaskTitle: " + m_CurrTask.getName());
-	}
+	
 
 	/**
 	 * Sets the current experiment and displays it on the screen.
@@ -247,6 +227,9 @@ public class ExperimentActivity extends FragmentActivity {
 							Toast.LENGTH_LONG).show();
 
 					Log.d(LOG_D, "Experiment added: " + m_CurrExperiment.toString());
+					
+					// exit the experiment activity
+					finish();
 
 				} catch (RemoteException e) {
 					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());

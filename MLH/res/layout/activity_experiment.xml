@@ -4,19 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/txtTitle"
-        style="@style/TitleFont"
-        android:layout_width="match_parent"
-        android:layout_height="35dp" />
-
-    <TextView
-        android:id="@+id/txtTaskName"
-        style="@style/SubTitleFont"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:textColor="#A52A2A" />
-
     <android.support.v4.view.ViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

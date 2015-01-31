@@ -1,6 +1,8 @@
 package android.mlh.aidl;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import android.os.Parcel;
@@ -17,6 +19,7 @@ public final class Experiment implements Parcelable, Serializable {
 	private HashMap<String, String> mParameters;
 	private HashMap<String, String> mResults;
 	private String mResultScore;
+	private Date creationDate;
 
 	private static final String LOG_D = "Experiment";
 
@@ -33,6 +36,8 @@ public final class Experiment implements Parcelable, Serializable {
 	public Experiment() {
 		mParameters = new HashMap<String, String>();
 		mResults = new HashMap<String, String>();
+
+		creationDate = new Date();
 	}
 
 	public void addParameter(String paramName, String paramValue) {
@@ -51,6 +56,18 @@ public final class Experiment implements Parcelable, Serializable {
 		return mResults.get(resultName);
 	}
 
+	public String getDate() {
+		if (creationDate == null) {
+			return "No date";
+		}
+		
+		SimpleDateFormat dmyFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+
+		// Format the date to String
+		String dmy = dmyFormat.format(creationDate);
+		return dmy;
+	}
+
 	/**
 	 * Sets the results hashmap.
 	 * 
@@ -60,19 +77,19 @@ public final class Experiment implements Parcelable, Serializable {
 	public void setResults(HashMap<String, String> a_Results) {
 		mResults = a_Results;
 	}
-	
+
 	public HashMap<String, String> getResults() {
 		return mResults;
 	}
-	
+
 	public void setParameters(HashMap<String, String> a_Parameters) {
 		mParameters = a_Parameters;
 	}
-	
+
 	public HashMap<String, String> getParameters() {
 		return mParameters;
 	}
-	
+
 	public void setResultScore(String resultScore) {
 		mResultScore = resultScore;
 	}
