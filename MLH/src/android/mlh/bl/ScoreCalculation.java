@@ -84,7 +84,7 @@ public class ScoreCalculation {
 	 */
 	private static float getHashMapValuesSum(HashMap<String, String> a_Map) {
 		float sum = 0;
-
+        // test
 		Iterator<Entry<String, String>> it = a_Map.entrySet().iterator();
 
 		while (it.hasNext()) {
