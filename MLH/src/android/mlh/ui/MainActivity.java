@@ -121,8 +121,9 @@ public class MainActivity extends ListActivity {
 		for (String el: FileManager.getInstance(getApplicationContext()).getSavedTasks()) {
 			HashMap<String,String> item = new HashMap<String,String>();
 			item.put(UIConstatns.ITEM_KEY, el);// el - filename , value - path to file
-			item.put(UIConstatns.ITEM_VALUE, FileManager.getInstance(getApplicationContext()).getTaskPath(el));
-
+			//item.put(UIConstatns.ITEM_VALUE, FileManager.getInstance(getApplicationContext()).getTaskPath(el));
+			item.put(UIConstatns.ITEM_VALUE, "Brief task description");
+			
 			savedTasks.add( item );
 		}
 	}
@@ -146,8 +147,6 @@ public class MainActivity extends ListActivity {
 		fillSavedTasks();
 
 		itemAdapter.notifyDataSetChanged();
-
-		Log.d(LOG_D, "onRestart");
 	}
 
 	private void bindPluginServices() {

@@ -9,13 +9,17 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.mlh.aidl.Experiment;
+import android.mlh.aidl.IMLHPlugin;
 import android.mlh.bl.files.FileManager;
+import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
 import android.mlh.constants.UIConstatns;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.example.mlh.R;
@@ -34,13 +39,43 @@ public class ExperimentListActivity extends ListActivity {
 	
 	private String LOG_D = "ExperimentListActivity";
 	
+	private Task m_CurrTask;
+
+	private IMLHPlugin m_CurrPlugin;
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment_list);
+		
+		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
 
+		m_CurrTask = TaskManager.getInstance().getCurrentTask();
+		
+		setActivityTitle();
+
+		setTaskName();
+		
 		setListAdapter();
 
 		setListeners();
+	}
+	
+	private void setActivityTitle() {
+		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+		
+		txtTitle.setText(m_CurrTask.getName());
+		Log.d(LOG_D, "setTaskTitle: " + m_CurrTask.getName());
+	}
+
+	private void setTaskName() {
+		TextView txtTaskName = (TextView) findViewById(R.id.txtTaskName);
+
+		try {
+			txtTaskName.setText(m_CurrPlugin.getPluginType());
+			Log.d(LOG_D, "setActivityTitle: " + m_CurrPlugin.getPluginType());
+		} catch (RemoteException e) {
+			Log.e(LOG_D, "setActivityTitle: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+		}
 	}
 	
 	@Override
@@ -73,8 +108,8 @@ public class ExperimentListActivity extends ListActivity {
 
 		for (Experiment el: TaskManager.getInstance().getCurrentTask().getExperiments()) {
 			HashMap<String,String> item = new HashMap<String,String>();
-			item.put(UIConstatns.ITEM_KEY, el.toString());
-			item.put(UIConstatns.ITEM_VALUE, "");
+			item.put(UIConstatns.ITEM_KEY, "Experiment: " + el.getResultScore());
+			item.put(UIConstatns.ITEM_VALUE, el.getDate());
 			
 			savedExperiments.add(item);
 		}

@@ -81,7 +81,7 @@ public class FileManager {
 	 * @throws ClassNotFoundException
 	 */
 	public Task getTask(String taskName) throws IOException, ClassNotFoundException {
-		String filename = taskName + 
+		String filename = FileConstatns.TASK_FILE_NAME_PREFIX + taskName + 
 				FileConstatns.OBJECT_FILE_NAME_EXT;
 		
 		FileInputStream fileIn;
@@ -159,8 +159,16 @@ public class FileManager {
 			if (file.isFile() && 
 					(file.getName().endsWith(FileConstatns.OBJECT_FILE_NAME_EXT) 
 					&& file.getName().startsWith(FileConstatns.TASK_FILE_NAME_PREFIX))) {
-				savedTasks.add(file.getName().substring(0, file.getName().length() -
-						FileConstatns.OBJECT_FILE_NAME_EXT.length()));
+				
+				String taskName = file.getName();
+				int extLength = FileConstatns.OBJECT_FILE_NAME_EXT.length();
+				int prefixLength = FileConstatns.TASK_FILE_NAME_PREFIX.length();
+				
+				taskName = taskName.substring(0, taskName.length() - extLength);
+				
+				taskName = taskName.substring(prefixLength, taskName.length());
+				
+				savedTasks.add(taskName);
 			}
 		}
 		
