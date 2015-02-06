@@ -23,6 +23,8 @@ import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
 import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Log4jHelper;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -67,7 +69,9 @@ public class MainActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
+		Logger.log(LOG_D, Logger.INFO_PRIORITY, "Activity started.");
+		
 		PluginManager.getInstance().clearServices();
 
 		setListAdapter();

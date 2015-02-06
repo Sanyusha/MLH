@@ -2,6 +2,7 @@ package android.mlh.aidl;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -18,6 +19,12 @@ public final class Experiment implements Parcelable, Serializable {
 	private static final long serialVersionUID = 1L;
 	private HashMap<String, String> mParameters;
 	private HashMap<String, String> mResults;
+	
+	// All the experiment steps will be stored in this array list.
+	// Every step is a collection of properties like:
+	// {description="...", time="...", ...}
+	private ArrayList<HashMap<String, String>> mSteps;
+	
 	private String mResultScore;
 	private Date creationDate;
 
