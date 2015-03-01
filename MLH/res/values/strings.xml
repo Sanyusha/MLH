@@ -21,12 +21,22 @@
 	<string name="experiment_parameters">Experiment parameters</string>
 	<string name="experiment_rate">Rate Experiment!</string>
 	
-	<string name="result_score">Result score</string>
+	<string name="step_description">Step description</string>
+	<string name="step_time">Step time</string>
+	<string name="step_empty">Step is empty!</string>
+	<string name="steps">Steps</string>
+	
+	<string name="enter_value">Enter value</string>
+	<string name="result_score">Score:</string>
 	<string name="save">Save</string>
+	<string name="open">Open</string>
 	<string name="ok">OK</string>
 	<string name="delete">Delete</string>
 	<string name="edit">Edit</string>
 	<string name="cancel">Cancel</string>
+	<string name="play">Play</string>
+	<string name="next">Next</string>
+	<string name="prev">Prev</string>
 	
 	<string name="err_current_plugin">Current plugin not selected</string>
 	<string name="err_plugin_connection">Plugin connection error</string>

@@ -33,9 +33,10 @@
 
     <Button
         android:id="@+id/btn_new_experiment"
-        style="@style/Button"
-        android:layout_height="50dp"
-        android:text="@string/create_new_experiment"
-        android:layout_width="wrap_content" />
+        style="@style/NiceButton"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:text="@string/create_new_experiment" />
 
 </LinearLayout>

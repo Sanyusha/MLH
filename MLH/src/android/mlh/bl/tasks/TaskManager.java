@@ -45,4 +45,12 @@ public class TaskManager {
 	public Task getCurrentTask() {
 		return currTask;
 	}
+	
+	/**
+	 * Returns reference to currently selected Experiment
+	 * @return currently selected Experiment
+	 */
+	public Experiment getCurrentExperiment() {
+		return currTask.getCurrentExperiment();
+	}
 }

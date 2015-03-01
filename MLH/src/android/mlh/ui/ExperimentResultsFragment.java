@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.RatingBar;
@@ -116,7 +118,7 @@ public class ExperimentResultsFragment extends ListFragment {
 					}
 				}
 				);
-
+				
 				holder.tv = tv;
 				holder.rb = rb;
 
@@ -128,6 +130,8 @@ public class ExperimentResultsFragment extends ListFragment {
 			holder.tv.setText(m_Items[position]);
 			holder.rb.setRating(Float.parseFloat(m_NewResults.get(holder.tv.getText()))
 					* holder.rb.getNumStars() / MAX_SCORE);
+			
+			
 			
 			return v;
 		}

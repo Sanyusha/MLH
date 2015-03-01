@@ -29,7 +29,7 @@ public class Task implements Serializable{
 	/** Holds the index of currently selected Experiment (if any)
 	 *  This value is -1 by default/when no Experiment is selected.
 	 */
-	private int mCurrExperiment = -1;
+	private int mCurrExperiment = CURRENT_EXPERIMENT_NOT_DEFINED;
 
 	private HashMap<String, String> mResultPriorities;
 	/** When we choose the task, we change it to the number (index in MainActivity.savedTasks arrayList)*/
@@ -124,11 +124,22 @@ public class Task implements Serializable{
 	}
 	
 	/**
-	 * Get the Experiment which is currently selected by the user
-	 * @return Experiment that is selected - the current experiment
+	 * Returns the index (among all the experiments of the current task)
+	 * of the experiment which is currently selected by the user.
 	 */
-	public int getCurrentExperiment() {
+	public int getCurrentExperimentIndex() {
 		return mCurrExperiment;
+	}
+	
+	/**
+	 * Returns the reference to the experiment which is currently selected by user.
+	 */
+	protected Experiment getCurrentExperiment() {
+		if (mCurrExperiment != CURRENT_EXPERIMENT_NOT_DEFINED) {
+			return this.getExperiments().get(mCurrExperiment);
+		} else {
+			return null;
+		}
 	}
 	
 	/**

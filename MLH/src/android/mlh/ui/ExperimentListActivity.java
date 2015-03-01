@@ -168,7 +168,7 @@ public class ExperimentListActivity extends ListActivity {
 								
 								//From selected task delete selected experiment, set experiment selected to -1
 								Task currentTask = TaskManager.getInstance().getCurrentTask();
-								currentTask.deleteExperiment(currentTask.getCurrentExperiment());
+								currentTask.deleteExperiment(currentTask.getCurrentExperimentIndex());
 								currentTask.setCurrentExperiment(Task.CURRENT_EXPERIMENT_NOT_DEFINED);
 								FileManager.getInstance(getApplicationContext()).saveTask(currentTask);
 								itemAdapter.notifyDataSetChanged();

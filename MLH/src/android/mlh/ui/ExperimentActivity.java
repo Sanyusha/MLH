@@ -3,6 +3,7 @@ package android.mlh.ui;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.example.mlh.R;
 import android.mlh.aidl.Experiment;
 import android.mlh.aidl.IMLHPlugin;
 import android.mlh.bl.ScoreCalculation;
@@ -10,6 +11,8 @@ import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
+import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -25,8 +28,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mlh.R;
-
 public class ExperimentActivity extends FragmentActivity {
 	/**
 	 * Current experiment that we are working on in the activity
@@ -40,7 +41,7 @@ public class ExperimentActivity extends FragmentActivity {
 
 	private MyPagerAdapter pageAdapter;
 
-	private final static String LOG_D = "ExperimentActivity";
+	private final static String LOG_D = UIConstatns.LOG_PREFIX + "ExperimentActivity";
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +57,7 @@ public class ExperimentActivity extends FragmentActivity {
 			finish();
 		}
 
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams. SOFT_INPUT_STATE_ALWAYS_HIDDEN );
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN );
 
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 
@@ -67,13 +68,13 @@ public class ExperimentActivity extends FragmentActivity {
 		setExperiment();
 	}
 
-	
+
 
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */
 	private void setExperiment() {
-		m_iCurrExperiment = m_CurrTask.getCurrentExperiment();
+		m_iCurrExperiment = m_CurrTask.getCurrentExperimentIndex();
 
 		Bundle state = new Bundle();
 
@@ -148,8 +149,9 @@ public class ExperimentActivity extends FragmentActivity {
 		private Bundle mInitState;
 		private HashMap<String, String> mResults;
 
-		private ExperimentParamsFragment m_PF;
-		private ExperimentResultsFragment m_RF;
+		private ExperimentParamsFragment m_PF = null;
+		private ExperimentResultsFragment m_RF = null;
+		private StepsFragment m_SF = null;
 
 		public Fragment getCurrentFragment() {
 			return mCurrentFragment;
@@ -161,6 +163,8 @@ public class ExperimentActivity extends FragmentActivity {
 			case 0:
 				return getString(R.string.experiment_parameters);
 			case 1:
+				return getString(R.string.steps);
+			case 2:
 				return getString(R.string.experiment_rate);
 			default:
 				return null;
@@ -193,8 +197,12 @@ public class ExperimentActivity extends FragmentActivity {
 						.getInstance().getCurrentPluginName(), mInitState);
 				return m_PF;
 			case 1:
+				m_SF = StepsFragment.newInstance();
+				return m_SF;
+			case 2:
 				m_RF = ExperimentResultsFragment.newInstance(mResults);
 				return m_RF;
+			
 			default:
 				return null;
 			}
@@ -202,7 +210,7 @@ public class ExperimentActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			return 2;
+			return 3;
 		}
 	}
 
@@ -218,6 +226,8 @@ public class ExperimentActivity extends FragmentActivity {
 
 					updateExperimentResults();
 
+					updateExperimentSteps();
+
 					updateResultScore();
 
 					updateCurrentTask();
@@ -226,13 +236,13 @@ public class ExperimentActivity extends FragmentActivity {
 							getString(R.string.experiment_saved),
 							Toast.LENGTH_LONG).show();
 
-					Log.d(LOG_D, "Experiment added: " + m_CurrExperiment.toString());
-					
+					Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Experiment saved: " + m_CurrExperiment.toString());
+
 					// exit the experiment activity
 					finish();
 
 				} catch (RemoteException e) {
-					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e + " " + e.getStackTrace());
 				} catch (IOException e) {
 					Log.e(LOG_D, "save experiment: " + ": " + e.getMessage());
 				}
@@ -259,18 +269,30 @@ public class ExperimentActivity extends FragmentActivity {
 	}
 
 	private void updateExperimentParams() throws RemoteException {
-		Bundle currState = pageAdapter.m_PF.captureParametersState();
-		Log.d(LOG_D, "Parameters state captured: " + currState);
-		Log.d(LOG_D, m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment).getParameters().toString());
+		if (pageAdapter.m_PF != null) {
+			Bundle currState = pageAdapter.m_PF.captureParametersState();
+			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Parameters state captured: " + currState);
 
-		Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
+			Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
 
-		m_CurrExperiment.setParameters(updatedExperiment.getParameters());
+			m_CurrExperiment.setParameters(updatedExperiment.getParameters());
+			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with parameters: " + m_CurrExperiment.getParameters());
+		}
 	}
 
-	private void updateExperimentResults() throws RemoteException {
-		HashMap<String, String> results = pageAdapter.m_RF.captureResultsState();
-		m_CurrExperiment.setResults(results);
+	private void updateExperimentResults() {
+		if (pageAdapter.m_RF != null) {
+			HashMap<String, String> results = pageAdapter.m_RF.captureResultsState();
+			m_CurrExperiment.setResults(results);
+			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with results: " + m_CurrExperiment.getResults());
+		}
+	}
+
+	private void updateExperimentSteps() {
+		if (pageAdapter.m_SF != null) {
+			m_CurrExperiment.setSteps(pageAdapter.m_SF.captureSteps());
+			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with " + m_CurrExperiment.getStepsCount() + "steps");
+		}
 	}
 
 	/**
