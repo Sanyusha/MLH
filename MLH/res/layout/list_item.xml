@@ -6,7 +6,7 @@
     android:paddingBottom="10dp" >
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/new_task_widget_iv"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginLeft="5dp"
@@ -18,7 +18,7 @@
         style="@style/TitleFont"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/imageView1"
+        android:layout_toRightOf="@+id/new_task_widget_iv"
         android:text="@string/no_text" />
 
     <TextView
