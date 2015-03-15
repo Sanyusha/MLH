@@ -35,7 +35,7 @@ public class SwipeMenuListView extends ListView {
 	private OnMenuItemClickListener mOnMenuItemClickListener;
 	private Interpolator mCloseInterpolator;
 	private Interpolator mOpenInterpolator;
-
+	
 	public SwipeMenuListView(Context context) {
 		super(context);
 		init();

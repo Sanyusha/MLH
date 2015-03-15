@@ -27,7 +27,8 @@ import com.example.mlh.R;
  * and not by the plugin.
  */
 public class StepsFragment extends Fragment {
-
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "StepsFragment";
+	
 	at.markushi.ui.CircleButton btnNext;
 
 	// to keep current step
@@ -42,13 +43,13 @@ public class StepsFragment extends Fragment {
 	private View mView;
 
 	private Button playButton, prevButton, nextButton;
-
-	private final static String LOG_D = UIConstatns.LOG_PREFIX + "StepsFragment";
 	
 	private EditText edit1;
 	private EditText edit2;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
+		
 		mView = inflater.inflate(R.layout.fragment_steps, container, false);
 		
 		edit1 = (EditText) mView.findViewById(R.id.edit1);
@@ -60,7 +61,7 @@ public class StepsFragment extends Fragment {
 			m_Steps = copySteps(m_CurrExperiment.getSteps());
 		} 
 
-		Logger.log(LOG_D, Logger.DEBUG_PRIORITY, 
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, 
 				"Experiment has the following steps: " + printSteps(m_Steps));
 
 		setButtons();
@@ -110,6 +111,11 @@ public class StepsFragment extends Fragment {
 	}
 
 	public ArrayList<HashMap<String, String>> captureSteps() {
+		if (edit1.getText().toString().length() != 0 
+				|| edit2.getText().toString().length() != 0) {
+			saveStep();
+		}
+		
 		return copySteps(m_Steps);
 	}
 
@@ -120,7 +126,9 @@ public class StepsFragment extends Fragment {
 		
 		// Start with the first step when the fragment is created
 		f.currentStep = 0;
-
+		
+		f.m_Steps = new ArrayList<HashMap<String,String>>();
+		
 		return f;
 	}
 
@@ -186,7 +194,7 @@ public class StepsFragment extends Fragment {
 		EditText edit2 = (EditText) mView.findViewById(R.id.edit2);
 		stepMap.put(Experiment.STEP_TIME, edit2.getText().toString());
 		
-		Logger.log(LOG_D, Logger.DEBUG_PRIORITY, 
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, 
 				"Saving current step. The steps are " + printSteps(m_Steps));
 	}
 

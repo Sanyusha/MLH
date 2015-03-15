@@ -29,7 +29,7 @@ public final class Experiment implements Parcelable, Serializable {
 	// {description="...", time="...", ...}
 	private ArrayList<HashMap<String, String>> mSteps;
 	
-	private String mResultScore;
+	private String mResultScore = "no score";
 	private Date creationDate;
 
 	private static final String LOG_D = "Experiment";

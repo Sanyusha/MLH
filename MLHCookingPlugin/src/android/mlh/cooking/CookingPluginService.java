@@ -15,6 +15,7 @@ public class CookingPluginService extends Service {
 	static final String CATEGORY_ADD_IF = "aexp.intent.category.ADD_PLUGIN";
 	static final String PLUGIN_TYPE = "Cooking task plugin";
 	
+	static final String INGRIDIENTS = "ingridients";
 	static final String GENERAL_TEXT = "general_text";
 	
 	private static final String[] RESULT_NAMES = {"Tasty", "Cheap", "Quick"};
@@ -60,6 +61,12 @@ public class CookingPluginService extends Service {
 			String o = state.getString(Integer.toString(R.id.edit1));
 			
 			if( o != null && o.length() > 0) {
+				retValue.addParameter(INGRIDIENTS, o);
+			}
+			
+			o = state.getString(Integer.toString(R.id.edit2));
+			
+			if( o != null && o.length() > 0) {
 				retValue.addParameter(GENERAL_TEXT, o);
 			}
 			
@@ -70,9 +77,11 @@ public class CookingPluginService extends Service {
 			Bundle state = new Bundle();
 			
 			if (experiment != null) {
-				state.putString(Integer.toString(R.id.edit1), experiment.getParameter(GENERAL_TEXT));
+				state.putString(Integer.toString(R.id.edit1), experiment.getParameter(INGRIDIENTS));
+				state.putString(Integer.toString(R.id.edit2), experiment.getParameter(GENERAL_TEXT));
 			} else {
 				state.putString(Integer.toString(R.id.edit1), "null");
+				state.putString(Integer.toString(R.id.edit2), "null");
 			}
 			
 			return state;
@@ -80,6 +89,10 @@ public class CookingPluginService extends Service {
 		
 		public String[] getResultNames() throws RemoteException {
 			return RESULT_NAMES;
+		}
+
+		public boolean hasSteps() throws RemoteException {
+			return true;
 		}
     };
 }

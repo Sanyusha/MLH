@@ -66,23 +66,15 @@ public class MainActivity extends Activity {
 	 */
 	private ArrayList<HashMap<String,String>> savedTasks = new ArrayList<HashMap<String,String>>();
 
-	private ArrayList<PluginServiceConnection> pluginServiceConnection = 
-			new ArrayList<PluginServiceConnection>();
-
-	private PackageBroadcastReceiver packageBroadcastReceiver;
-	private IntentFilter packageFilter;
-
 	private SwipeMenuListView listView;
 
 	private final static String LOG_D = UIConstatns.LOG_PREFIX + "MainActivity";
 
 	protected void onCreate(Bundle savedInstanceState) {
+		Logger.log(LOG_D, Logger.INFO_PRIORITY, "Activity started");
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		Logger.log(LOG_D, Logger.INFO_PRIORITY, "Activity started.");
-
-		PluginManager.getInstance().clearServices();
 
 		prepareList();
 
@@ -95,15 +87,7 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		fillPluginList();
-
-		packageBroadcastReceiver = new PackageBroadcastReceiver();
-		packageFilter = new IntentFilter();
-		packageFilter.addAction( Intent.ACTION_PACKAGE_ADDED  );
-		packageFilter.addAction( Intent.ACTION_PACKAGE_REPLACED );
-		packageFilter.addAction( Intent.ACTION_PACKAGE_REMOVED );
-		packageFilter.addCategory( Intent.CATEGORY_DEFAULT ); 
-		packageFilter.addDataScheme( "package" );
+		
 	}
 
 	/**
@@ -252,19 +236,15 @@ public class MainActivity extends Activity {
 			savedTasks.add( item );
 		}
 	}
-
+	
+	/*
 	private void releasePluginServices() {
 		for( int i = 0 ; i < PluginManager.getInstance().getServices().size() ; ++i ) {
 			unbindService( pluginServiceConnection.get(i) );
 		}
 	}
-
-	protected void onStart() {
-		super.onStart();
-		registerReceiver( packageBroadcastReceiver, packageFilter );
-		bindPluginServices();
-	}
-
+	 */
+	
 	@Override
 	public void onRestart() { 
 		super.onRestart();
@@ -274,21 +254,9 @@ public class MainActivity extends Activity {
 		itemAdapter.notifyDataSetChanged();
 	}
 
-	private void bindPluginServices() {
-		for( int i = 0 ; i < PluginManager.getInstance().getServices().size() ; ++i ) {
-			pluginServiceConnection.add(new PluginServiceConnection(i));
-			Intent intent = new Intent();
-			HashMap<String,String> data = PluginManager.getInstance().getServices().get(i);
-
-			intent.setClassName( data.get( UIConstatns.ITEM_KEY ),data.get( UIConstatns.ITEM_VALUE ) );
-			bindService( intent, pluginServiceConnection.get(i), Context.BIND_AUTO_CREATE );
-		}
-	}
-
 	protected void onStop() {
 		super.onStop();
-		unregisterReceiver( packageBroadcastReceiver );
-		releasePluginServices();
+		//releasePluginServices();
 	}
 
 	private void setOnListItemLongClick() {
@@ -307,66 +275,6 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
-	private void fillPluginList() {
-		PackageManager packageManager = getPackageManager();
-		Intent baseIntent = new Intent(PluginManager.ACTION_PICK_PLUGIN);
-
-		baseIntent.setFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
-
-		List<ResolveInfo> list = packageManager.queryIntentServices(baseIntent,
-				PackageManager.GET_RESOLVED_FILTER );
-
-		for(int i = 0 ; i < list.size(); ++i) {
-			ResolveInfo info = list.get( i );
-			ServiceInfo sinfo = info.serviceInfo;
-			Log.d( "fillPluginList", "fillPluginList: i: "+i+"; packageName: "+sinfo.packageName );
-			if( sinfo != null ) {
-				HashMap<String,String> item = new HashMap<String,String>();
-				item.put( UIConstatns.ITEM_KEY, sinfo.packageName );
-				item.put( UIConstatns.ITEM_VALUE, sinfo.name );
-				PluginManager.getInstance().addService(item);
-			}
-		}
-	}
-
-	class PackageBroadcastReceiver extends BroadcastReceiver {
-		public void onReceive(Context context, Intent intent) {
-			PluginManager.getInstance().clearServices();
-			fillPluginList();
-			itemAdapter.notifyDataSetChanged();
-		}
-	}
-
-	class PluginServiceConnection implements ServiceConnection {
-		//private int serviceID;
-		private String serviceName;
-
-		public PluginServiceConnection(int serviceID) {
-			//I took the packageName of the plugin as 
-			//the identifier for the plugin in the PluginManager
-			this.serviceName = PluginManager.getInstance().getServices()
-					.get(serviceID).get(UIConstatns.ITEM_KEY);
-		}
-
-		public void onServiceConnected(ComponentName className, 
-				IBinder boundService ) {
-
-			Log.d(LOG_D, "service <" + serviceName + "> connected");
-
-			PluginManager.getInstance().addPlugin(serviceName, 
-					IMLHPlugin.Stub.asInterface((IBinder)boundService));
-		}
-
-		public void onServiceDisconnected(ComponentName className) {
-			//iMLHPlugin.remove(serviceName);
-		}
-	};
-
-	private int dp2px(int dp) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				this.getResources().getDisplayMetrics());
-	}
-
 	/**
 	 * Represents the menu that appears after swiping on the list item.
 	 */
@@ -379,7 +287,7 @@ public class MainActivity extends Activity {
 			editItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
 					0xCE)));
 			// set item width
-			editItem.setWidth(dp2px(90));
+			editItem.setWidth(UIUtils.dp2px(getApplicationContext(), 90));
 			// set item title
 			editItem.setTitle(getString(R.string.edit));
 			// set item title fontsize
@@ -396,7 +304,7 @@ public class MainActivity extends Activity {
 			deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
 					0x3F, 0x25)));
 			// set item width
-			deleteItem.setWidth(dp2px(90));
+			deleteItem.setWidth(UIUtils.dp2px(getApplicationContext(), 90));
 			// set item title
 			deleteItem.setTitle(getString(R.string.delete));
 			// set item title fontsize

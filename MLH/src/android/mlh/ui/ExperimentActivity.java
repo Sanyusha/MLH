@@ -29,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ExperimentActivity extends FragmentActivity {
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "ExperimentActivity";
+
 	/**
 	 * Current experiment that we are working on in the activity
 	 */
@@ -41,14 +43,24 @@ public class ExperimentActivity extends FragmentActivity {
 
 	private MyPagerAdapter pageAdapter;
 
-	private final static String LOG_D = UIConstatns.LOG_PREFIX + "ExperimentActivity";
-
 	protected void onCreate(Bundle savedInstanceState) {
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Activity started");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment);
 
-		Log.d(LOG_D, "Starting loading ExperimentActivity...");
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN );
+		
+		setCurrentPlugin();
+		
+		setSaveButtonListener();
 
+		setCancelButtonListener();
+
+		setExperiment();
+	}
+	
+	private void setCurrentPlugin() {
 		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
 
 		// Current plugin existence validation.
@@ -56,26 +68,18 @@ public class ExperimentActivity extends FragmentActivity {
 			Toast.makeText(this, getString(R.string.err_current_plugin), Toast.LENGTH_LONG).show();
 			finish();
 		}
-
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN );
-
+		
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
-
-		setSaveButtonListener();
-
-		setCancelButtonListener();
-
-		setExperiment();
 	}
-
-
-
+	
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */
 	private void setExperiment() {
 		m_iCurrExperiment = m_CurrTask.getCurrentExperimentIndex();
-
+		
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment: " + m_iCurrExperiment);
+		
 		Bundle state = new Bundle();
 
 		if (m_iCurrExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
@@ -85,9 +89,10 @@ public class ExperimentActivity extends FragmentActivity {
 
 			try {
 				state = m_CurrPlugin.getState(m_CurrExperiment);
-
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment state is " + state);
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment state is " + state.toString());
 			} catch (RemoteException e) {
-				Log.e(LOG_D, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+				Log.e(LOG_TAG, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
 			}
 		}
 
@@ -105,7 +110,7 @@ public class ExperimentActivity extends FragmentActivity {
 					results.put(string, "-1"); // put zero as default, will be changed
 				}
 			} catch (RemoteException e) {
-				Log.e(LOG_D, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+				Log.e(LOG_TAG, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
 			}
 		}
 
@@ -124,11 +129,16 @@ public class ExperimentActivity extends FragmentActivity {
 	 * Updates the result score.
 	 */
 	private void updateResultScore() {
+		if (pageAdapter.m_RF == null) {
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Results fragment is null");
+			return;
+		}
+
 		HashMap<String, String> results = pageAdapter.m_RF
 				.captureResultsState();
 		HashMap<String, String> resultPriorities = null;
 
-		Log.d(LOG_D, "Update result score according to the following results: "
+		Log.d(LOG_TAG, "Update result score according to the following results: "
 				+ results);
 
 		TextView tv = (TextView) findViewById(R.id.txtScore);
@@ -153,6 +163,8 @@ public class ExperimentActivity extends FragmentActivity {
 		private ExperimentResultsFragment m_RF = null;
 		private StepsFragment m_SF = null;
 
+		private boolean bShowSteps;
+
 		public Fragment getCurrentFragment() {
 			return mCurrentFragment;
 		}
@@ -163,7 +175,10 @@ public class ExperimentActivity extends FragmentActivity {
 			case 0:
 				return getString(R.string.experiment_parameters);
 			case 1:
-				return getString(R.string.steps);
+				if (bShowSteps)
+					return getString(R.string.steps);
+				else
+					return getString(R.string.experiment_rate);
 			case 2:
 				return getString(R.string.experiment_rate);
 			default:
@@ -186,6 +201,16 @@ public class ExperimentActivity extends FragmentActivity {
 
 			mInitState = aInitState;
 			mResults = results;
+
+			try {
+				bShowSteps = m_CurrPlugin.hasSteps();
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, 
+						"Current plugin has steps: " + bShowSteps);
+			} catch (RemoteException e) {
+				Logger.log(LOG_TAG, Logger.WARN_PRIORITY, 
+						getString(R.string.err_plugin_connection));
+				bShowSteps = false;
+			}
 		}
 
 		@Override
@@ -193,24 +218,35 @@ public class ExperimentActivity extends FragmentActivity {
 			switch (pos) {
 
 			case 0:
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
 				m_PF = ExperimentParamsFragment.newInstance(PluginManager
 						.getInstance().getCurrentPluginName(), mInitState);
 				return m_PF;
 			case 1:
-				m_SF = StepsFragment.newInstance();
-				return m_SF;
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
+				if (bShowSteps) {
+					m_SF = StepsFragment.newInstance();
+					return m_SF;
+				} else {
+					m_RF = ExperimentResultsFragment.newInstance(mResults);
+					return m_RF;
+				}
 			case 2:
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
 				m_RF = ExperimentResultsFragment.newInstance(mResults);
 				return m_RF;
-			
+
 			default:
 				return null;
 			}
 		}
 
-		@Override
+
+		/* 
+		 * Returns 3 if the plugin has steps otherwise 2.
+		 */
 		public int getCount() {
-			return 3;
+			return (bShowSteps ? 3 : 2);
 		}
 	}
 
@@ -236,15 +272,15 @@ public class ExperimentActivity extends FragmentActivity {
 							getString(R.string.experiment_saved),
 							Toast.LENGTH_LONG).show();
 
-					Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Experiment saved: " + m_CurrExperiment.toString());
+					Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment saved: " + m_CurrExperiment.toString());
 
 					// exit the experiment activity
 					finish();
 
 				} catch (RemoteException e) {
-					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e + " " + e.getStackTrace());
+					Log.e(LOG_TAG, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e + " " + e.getStackTrace());
 				} catch (IOException e) {
-					Log.e(LOG_D, "save experiment: " + ": " + e.getMessage());
+					Log.e(LOG_TAG, "save experiment: " + ": " + e.getMessage());
 				}
 			}
 		});
@@ -271,12 +307,12 @@ public class ExperimentActivity extends FragmentActivity {
 	private void updateExperimentParams() throws RemoteException {
 		if (pageAdapter.m_PF != null) {
 			Bundle currState = pageAdapter.m_PF.captureParametersState();
-			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Parameters state captured: " + currState);
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Parameters state captured: " + currState);
 
 			Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
 
 			m_CurrExperiment.setParameters(updatedExperiment.getParameters());
-			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with parameters: " + m_CurrExperiment.getParameters());
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with parameters: " + m_CurrExperiment.getParameters());
 		}
 	}
 
@@ -284,14 +320,14 @@ public class ExperimentActivity extends FragmentActivity {
 		if (pageAdapter.m_RF != null) {
 			HashMap<String, String> results = pageAdapter.m_RF.captureResultsState();
 			m_CurrExperiment.setResults(results);
-			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with results: " + m_CurrExperiment.getResults());
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with results: " + m_CurrExperiment.getResults());
 		}
 	}
 
 	private void updateExperimentSteps() {
 		if (pageAdapter.m_SF != null) {
 			m_CurrExperiment.setSteps(pageAdapter.m_SF.captureSteps());
-			Logger.log(LOG_D, Logger.DEBUG_PRIORITY, "Current experiment updated with " + m_CurrExperiment.getStepsCount() + "steps");
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with " + m_CurrExperiment.getStepsCount() + "steps");
 		}
 	}
 

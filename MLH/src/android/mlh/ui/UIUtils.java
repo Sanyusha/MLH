@@ -1,5 +1,7 @@
 package android.mlh.ui;
 
+import android.content.Context;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ListView;
 
@@ -23,5 +25,13 @@ public class UIUtils {
 			final int childIndex = pos - firstListItemPosition;
 			return listView.getChildAt(childIndex);
 		}
+	}
+	
+	/**
+	 * Transforms dp to px in specific context.
+	 */
+	public static int dp2px(Context context, int dp) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				context.getResources().getDisplayMetrics());
 	}
 }

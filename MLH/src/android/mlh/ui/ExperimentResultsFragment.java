@@ -3,6 +3,8 @@ package android.mlh.ui;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -23,8 +25,8 @@ import com.example.mlh.R;
  * and not by the plugin.
  */
 public class ExperimentResultsFragment extends ListFragment {
-
-	private final static String LOG_D = "ExperimentResultsFragment";
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "ExperimentResultsFragment";
+	
 	private final static String NO_SCORE = "-1";
 	
 	private static ExperimentResultsFragment f;
@@ -36,9 +38,11 @@ public class ExperimentResultsFragment extends ListFragment {
 	private final int DEFAULT_SCORE = 80;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
+		
 		View v = inflater.inflate(R.layout.fragment_experiment_results, container, false);
 
-		Log.d(LOG_D, "onCreateView: experiment results are: " + m_Results);
+		Log.d(LOG_TAG, "onCreateView: experiment results are: " + m_Results);
 		
 		// You can't simply cast an Object[] array to a String[] array. 
 		// You should instead use the generic version of toArray, which should work better.
@@ -66,7 +70,7 @@ public class ExperimentResultsFragment extends ListFragment {
 	 * the hashmap of results
 	 */
 	public HashMap<String, String> captureResultsState() {
-		Log.d(LOG_D, "Capturing results state from fragment.");
+		Log.d(LOG_TAG, "Capturing results state from fragment.");
 
 		return m_ListAdapter.m_NewResults;
 	}
@@ -109,7 +113,7 @@ public class ExperimentResultsFragment extends ListFragment {
 					m_NewResults.put(m_Items[position], m_Results.get(m_Items[position]));
 				}
 				
-				Log.d(LOG_D, "The current result for " + m_Items[position] + " is " + m_NewResults.get(m_Items[position]));
+				Log.d(LOG_TAG, "The current result for " + m_Items[position] + " is " + m_NewResults.get(m_Items[position]));
 				
 				rb.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {

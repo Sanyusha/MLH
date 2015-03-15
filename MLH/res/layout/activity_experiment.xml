@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/glossy_gradient"
     >
 
     <android.support.v4.view.ViewPager
@@ -40,7 +41,7 @@
             style="@style/TitleFont"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="12dp"
-            android:layout_width="50dp"
+            android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_toRightOf="@+id/txtScoreTitle" />
         

@@ -12,4 +12,6 @@ interface IMLHPlugin {
   Bundle getState(in Experiment experiment);
   
   String[] getResultNames();
+  
+  boolean hasSteps();
 }

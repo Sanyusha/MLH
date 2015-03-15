@@ -5,12 +5,19 @@
     android:orientation="vertical" >
 
     <TextSwitcher
-        android:id="@+id/textSwitcher"
+        android:id="@+id/stepDescSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp" />
+	
+    <TextSwitcher
+        android:id="@+id/stepTimeSwitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="50dp" />
-
+    
     <at.markushi.ui.CircleButton
         android:layout_marginTop="20dp"
         android:id="@+id/buttonNext"

@@ -99,6 +99,10 @@ public class OrderFoodPluginService extends Service {
 		public String[] getResultNames() throws RemoteException {
 			return RESULT_NAMES;
 		}
+
+		public boolean hasSteps() throws RemoteException {
+			return false;
+		}
     };
 }
 

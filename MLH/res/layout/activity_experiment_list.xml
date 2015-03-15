@@ -3,7 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:paddingTop="10dp" >
+    android:paddingTop="10dp"
+    android:background="@drawable/glossy_gradient" >
 
     <TextView
         android:id="@+id/txtTitle"
@@ -24,12 +25,13 @@
         android:layout_margin="5dp"
         android:background="@android:color/background_light" />
 
-    <ListView
-        android:id="@+id/android:list"
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_margin="5dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:listSelector="@drawable/list_selector" />
 
     <Button
         android:id="@+id/btn_new_experiment"

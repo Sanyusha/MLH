@@ -5,6 +5,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.mlh.bl.plugins.PluginManager;
+import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -24,8 +26,8 @@ import com.example.mlh.R;
  * and not by by MLH main app.
  */
 public class ExperimentParamsFragment extends Fragment {
-
-	private final static String LOG_D = "ExperimentParamsFragment";
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "ExperimentParamsFragment";
+	
 	private final static int idOffset = 100;
 
 	private static ExperimentParamsFragment f;
@@ -37,7 +39,8 @@ public class ExperimentParamsFragment extends Fragment {
 	private String mPackageName;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
+		
 		mInflater = inflater;
 
 		mView = mInflater.inflate(R.layout.fragment_experiment_params, container, false);
@@ -58,7 +61,7 @@ public class ExperimentParamsFragment extends Fragment {
 	 */
 	private void inflateToView() {
 		try {
-			Log.d(LOG_D, PluginManager.getInstance().getCurrentPluginName());
+			Log.d(LOG_TAG, PluginManager.getInstance().getCurrentPluginName());
 
 			String packageName = mPackageName;
 			ApplicationInfo info = getActivity().getPackageManager().getApplicationInfo( packageName, 0 );
@@ -76,7 +79,7 @@ public class ExperimentParamsFragment extends Fragment {
 
 			adjustSubViewIds(parentView);
 		} catch (NameNotFoundException e) {
-			Log.d(LOG_D, e.getMessage());
+			Log.d(LOG_TAG, e.getMessage());
 		}
 	}
 
@@ -85,10 +88,15 @@ public class ExperimentParamsFragment extends Fragment {
 	 * Gets a bundle with current state as parameter.
 	 */
 	public static ExperimentParamsFragment newInstance(String aPackageName, Bundle aInitState) {
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Getting new instance of a fragment");
+		
+		
 		if (f == null) {
 			f = new ExperimentParamsFragment();
 		}
-
+		
+		//Toast.makeText(f.getActivity(), "AAAAAAAAAAAa", Toast.LENGTH_LONG).show();
+		
 		f.mInitState = aInitState;
 		f.mPackageName = aPackageName;
 
@@ -96,7 +104,7 @@ public class ExperimentParamsFragment extends Fragment {
 	}
 
 	public Bundle captureParametersState() {
-		Log.d(LOG_D, "Capturing parameters state from fragment.");
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Capturing parameters state from fragment.");
 
 		Bundle state = new Bundle();
 		ViewGroup parent = (ViewGroup) mView.findViewById(R.id.expLL);
@@ -115,7 +123,7 @@ public class ExperimentParamsFragment extends Fragment {
 				if( v instanceof TextView ) {
 					TextView e = (TextView)v;
 					int id = e.getId() - idOffset;
-					Log.d(LOG_D, "tv id = " + e.getId());
+					Log.d(LOG_TAG, "tv id = " + e.getId());
 					state.putString( Integer.toString(id), e.getText().toString() );
 				}
 		}        
@@ -176,13 +184,13 @@ public class ExperimentParamsFragment extends Fragment {
 	 * with the bundle received from the current plugin.
 	 */
 	public void populateExperimentForm(Bundle state) {
-		Log.d(LOG_D, "populating experiment form from " + state);
+		Log.d(LOG_TAG, "populating experiment form from " + state);
 
 		for (String key: state.keySet()) {
 			//TextView tv = (TextView) findViewById(Integer.getInteger(key) + idOffset);
 			int viewID = Integer.parseInt(key) + idOffset;
 
-			Log.d(LOG_D, "key = " + viewID + ", value = " + state.getString(key));
+			Log.d(LOG_TAG, "key = " + viewID + ", value = " + state.getString(key));
 			TextView tv = (TextView) mView.findViewById(viewID);
 
 			tv.setText(state.getString(key));
