@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android" android:minWidth="144dp" android:minHeight="48dp" android:initialLayout="@layout/new_task_widget">
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android" android:minWidth="40dp" android:minHeight="48dp" android:initialLayout="@layout/new_task_widget">
     
 48dp 144dp 144dp 
 </appwidget-provider>

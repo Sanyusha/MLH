@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.example.mlh"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.mlh"
     android:versionCode="1"
-    android:versionName="1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -37,18 +38,25 @@
             android:name="android.mlh.ui.ExperimentListActivity"
             android:label="@string/experiment_list" >
         </activity>
-        
-         <receiver android:name="android.mlh.widgets.NewTaskWidgetProvider" >
-            <intent-filter >
-                <action 
-                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+        <receiver android:name="android.mlh.widgets.NewTaskWidgetProvider" android:label="MLH widget#1" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_task_widget_ifo" />
         </receiver>
-        
+        <receiver android:name="android.mlh.widgets.AddExperimentWidgetProvider" android:label="MLH widget#2" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/add_experiment_widget_ifo" />
+        </receiver>
     </application>
 
 </manifest>

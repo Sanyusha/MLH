@@ -32,4 +32,8 @@
 	<string name="err_plugin_connection">Plugin connection error</string>
 	
 	<string name="no_text">No text</string>
+	
+	<string name="set_task_tv">Set</string>
+	
+	<string name="goto_task_widget_tv">Go</string>
 </resources>
