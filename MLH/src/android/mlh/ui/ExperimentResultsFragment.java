@@ -3,9 +3,14 @@ package android.mlh.ui;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.mlh.aidl.Experiment;
+import android.mlh.aidl.IMLHPlugin;
+import android.mlh.bl.plugins.PluginManager;
+import android.mlh.bl.tasks.TaskManager;
 import android.mlh.constants.UIConstatns;
 import android.mlh.logger.Logger;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,19 +35,55 @@ public class ExperimentResultsFragment extends ListFragment {
 	private final static String NO_SCORE = "-1";
 	
 	private static ExperimentResultsFragment f;
-	private HashMap<String, String> m_Results;
-
+	
 	private ListAdapter m_ListAdapter;
 	
 	private final int MAX_SCORE = 100;
 	private final int DEFAULT_SCORE = 80;
 	
+	private IMLHPlugin m_CurrPlugin;
+	private Experiment m_CurrExperiment;
+	
+	private HashMap<String, String> m_Results;
+	
+	public static ExperimentResultsFragment newInstance() {
+		if (f == null) {
+			f = new ExperimentResultsFragment();
+		}
+
+		return f;
+	}
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
 		
 		View v = inflater.inflate(R.layout.fragment_experiment_results, container, false);
+		
+		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
+		m_CurrExperiment = TaskManager.getInstance().getCurrentExperiment();
+		
+		m_Results = new HashMap<String, String>();
 
-		Log.d(LOG_TAG, "onCreateView: experiment results are: " + m_Results);
+		// get results from experiment
+		if (m_CurrExperiment != null) {
+			m_Results = m_CurrExperiment.getResults();
+		}
+		
+		if (m_Results.isEmpty()) { // experiment just created, fill the results
+			String[] resultNames;
+			try {
+				resultNames = m_CurrPlugin.getResultNames();
+
+				for (String string : resultNames) {
+					m_Results.put(string, NO_SCORE); // put zero as default, will be changed
+				}
+			} catch (RemoteException e) {
+				Logger.log(LOG_TAG, Logger.WARN_PRIORITY, 
+						"setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+			}
+		}
+		
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "onCreateView: experiment results are: " + m_Results);
 		
 		// You can't simply cast an Object[] array to a String[] array. 
 		// You should instead use the generic version of toArray, which should work better.
@@ -52,16 +93,6 @@ public class ExperimentResultsFragment extends ListFragment {
 		setListAdapter(m_ListAdapter);
 
 		return v;
-	}
-
-	public static ExperimentResultsFragment newInstance(HashMap<String, String> a_Results) {
-		if (f == null) {
-			f = new ExperimentResultsFragment();
-		}
-
-		f.m_Results = a_Results;
-
-		return f;
 	}
 
 	/**

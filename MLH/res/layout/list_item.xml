@@ -11,13 +11,14 @@
         android:layout_height="20dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="4dp"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/point" />
 
     <TextView
         android:id="@+id/text1"
         style="@style/TitleFont"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
         android:layout_toRightOf="@+id/imageView1"
         android:text="@string/no_text" />
 
@@ -27,6 +28,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text1"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="10dp"
         android:text="@string/no_text"
         android:textColor="@color/gray" />
 

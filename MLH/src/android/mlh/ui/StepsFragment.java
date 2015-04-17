@@ -27,25 +27,19 @@ import com.example.mlh.R;
  * and not by the plugin.
  */
 public class StepsFragment extends Fragment {
-	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "StepsFragment";
-	
-	at.markushi.ui.CircleButton btnNext;
-
-	// to keep current step
-	private int currentStep; 
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "StepsFragment"; 
 
 	private static StepsFragment f;
 
 	private ArrayList<HashMap<String, String>> m_Steps = new ArrayList<HashMap<String,String>>();
-
 	private Experiment m_CurrExperiment;
-
-	private View mView;
-
-	private Button playButton, prevButton, nextButton;
 	
-	private EditText edit1;
-	private EditText edit2;
+	private View mView;
+	private Button playButton, prevButton, nextButton;
+	private EditText edit1, edit2;
+	
+	// to keep current step
+	private int currentStep;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
@@ -77,7 +71,12 @@ public class StepsFragment extends Fragment {
 		// Capture button clicks
 		playButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				PlayExperimentFragment dFragment = PlayExperimentFragment.newInstance();
+				if (edit1.getText().toString().length() != 0 
+						|| edit2.getText().toString().length() != 0) {
+					saveStep();
+				}
+				
+				PlayExperimentFragment dFragment = PlayExperimentFragment.newInstance(m_Steps);
 				// Show DialogFragment
 				dFragment.show(getFragmentManager(), "Dialog Fragment");
 			}
@@ -103,7 +102,11 @@ public class StepsFragment extends Fragment {
 
 		prevButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				saveStep();
+				if (!(edit1.getText().toString().length() == 0 
+						&& edit2.getText().toString().length() == 0)) {
+					saveStep();
+				}
+				
 				currentStep--;
 				populateStep();
 			}

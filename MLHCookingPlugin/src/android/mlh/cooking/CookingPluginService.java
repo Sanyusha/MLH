@@ -79,9 +79,6 @@ public class CookingPluginService extends Service {
 			if (experiment != null) {
 				state.putString(Integer.toString(R.id.edit1), experiment.getParameter(INGRIDIENTS));
 				state.putString(Integer.toString(R.id.edit2), experiment.getParameter(GENERAL_TEXT));
-			} else {
-				state.putString(Integer.toString(R.id.edit1), "null");
-				state.putString(Integer.toString(R.id.edit2), "null");
 			}
 			
 			return state;

@@ -15,11 +15,22 @@
 
     <EditText
         android:id="@+id/edit2"
-        android:layout_width="150dp"
+        android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="20dp"
         android:layout_below="@+id/textView2"
-        android:hint="@string/enter_value" />
+        android:layout_marginTop="20dp"
+        android:inputType="numberDecimal|numberSigned" />
+
+    <TextView
+        android:id="@+id/textView3"
+        style="@style/SubTitleFont"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/edit2"
+        android:layout_below="@+id/textView2"
+        android:text="@string/minutes" />
 
     <TextView
         android:id="@+id/textView1"
@@ -35,8 +46,8 @@
         android:id="@+id/edit1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="20dp"
         android:layout_below="@+id/textView1"
+        android:layout_marginTop="20dp"
         android:hint="@string/enter_value" />
 
     <Button
@@ -64,17 +75,17 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/btnPlay"
         android:layout_margin="5dp"
-        android:text="@string/next"
-        android:background="@drawable/nice_button" />
+        android:background="@drawable/nice_button"
+        android:text="@string/next" />
 
     <Button
         android:id="@+id/btnPrev"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/btnNext"
         android:layout_below="@+id/btnPlay"
         android:layout_margin="5dp"
-        android:text="@string/prev"
-        android:background="@drawable/nice_button" />
+        android:layout_toLeftOf="@+id/btnNext"
+        android:background="@drawable/nice_button"
+        android:text="@string/prev" />
 
 </RelativeLayout>

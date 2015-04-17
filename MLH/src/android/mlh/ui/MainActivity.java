@@ -3,23 +3,14 @@ package android.mlh.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.mlh.aidl.IMLHPlugin;
 import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
@@ -27,18 +18,17 @@ import android.mlh.bl.tasks.TaskManager;
 import android.mlh.constants.UIConstatns;
 import android.mlh.logger.Logger;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
-import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,8 +76,6 @@ public class MainActivity extends Activity {
 				openNewTaskActivity();
 			}
 		});
-
-		
 	}
 
 	/**
@@ -99,7 +87,8 @@ public class MainActivity extends Activity {
 		listView = (SwipeMenuListView) findViewById(R.id.listView);
 
 		fillSavedTasks();
-
+		
+		/*
 		itemAdapter =
 				new SimpleAdapter(this, 
 						savedTasks,
@@ -107,9 +96,12 @@ public class MainActivity extends Activity {
 						new String[] {UIConstatns.ITEM_KEY, UIConstatns.ITEM_VALUE},
 						new int[] { R.id.text1, R.id.text2}
 						);
-
-		listView.setAdapter(itemAdapter);
-
+		*/
+		
+		//listView.setAdapter(itemAdapter);
+		
+		listView.setAdapter(new MainActivity.ListAdapter());
+		
 		listView.setMenuCreator(new ListMenuCreator());
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -278,7 +270,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Represents the menu that appears after swiping on the list item.
 	 */
-	private class ListMenuCreator implements SwipeMenuCreator {
+	private final class ListMenuCreator implements SwipeMenuCreator {
 		public void create(SwipeMenu menu) {
 			// create "open" item
 			SwipeMenuItem editItem = new SwipeMenuItem(
@@ -314,5 +306,61 @@ public class MainActivity extends Activity {
 			// add to menu
 			menu.addMenuItem(deleteItem);
 		}		
+	}
+	
+	/**
+	 * Inner class for an adapter to the listview of tasks.
+	 */
+	private final class ListAdapter extends BaseAdapter {
+		
+		public int getCount() {
+			return savedTasks.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			ViewHolder v;
+			
+			if (view == null) {
+				// This a new view we inflate the new layout
+				Context currContext = MainActivity.this;
+				LayoutInflater inflater = (LayoutInflater) currContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.list_item, null);
+				
+				v = new ViewHolder();
+				v.text1 = (TextView) view.findViewById(R.id.text1);
+				v.text2 = (TextView) view.findViewById(R.id.text2);
+				
+				view.setTag(v);
+			} else {
+				v = (ViewHolder) view.getTag();
+			}
+			
+			v.text1.setText(savedTasks.get(position).get(UIConstatns.ITEM_KEY));
+			v.text2.setText(savedTasks.get(position).get(UIConstatns.ITEM_VALUE));
+			
+			return view;
+		}
+	}
+	
+	/**
+	 * A ViewHolder object stores each of the component views inside the tag field
+	 * of the Layout, so you can immediately access them without the need 
+	 * to look them up repeatedly.
+	 */
+	private static final class ViewHolder {
+		TextView text1, text2;
 	}
 }

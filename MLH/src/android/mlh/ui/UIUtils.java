@@ -1,7 +1,12 @@
 package android.mlh.ui;
 
+import java.math.BigDecimal;
+
+import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.widget.ListView;
 
@@ -34,4 +39,39 @@ public class UIUtils {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
 				context.getResources().getDisplayMetrics());
 	}
+	
+	/**
+	 * Returns the screen width in pixels
+	 */
+	public static float getDisplayWidth(Activity activity) {
+		Display display = activity.getWindowManager().getDefaultDisplay();
+	    DisplayMetrics outMetrics = new DisplayMetrics();
+	    display.getMetrics(outMetrics);
+
+	    return outMetrics.widthPixels;
+	}
+	
+	/**
+	 * Returns the screen height in pixels
+	 */
+	public static float getDisplayHeight(Activity activity) {
+		Display display = activity.getWindowManager().getDefaultDisplay();
+	    DisplayMetrics outMetrics = new DisplayMetrics();
+	    display.getMetrics(outMetrics);
+
+	    return outMetrics.heightPixels;
+	}
+	
+	/**
+     * Round to certain number of decimals
+     * 
+     * @param d
+     * @param decimalPlace
+     * @return
+     */
+    public static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
+    }
 }

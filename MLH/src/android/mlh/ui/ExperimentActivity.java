@@ -35,13 +35,14 @@ public class ExperimentActivity extends FragmentActivity {
 	 * Current experiment that we are working on in the activity
 	 */
 	private int m_iCurrExperiment;
+	private IMLHPlugin m_CurrPlugin;
 	private Experiment m_CurrExperiment;
 
 	private Task m_CurrTask;
 
-	private IMLHPlugin m_CurrPlugin;
-
 	private MyPagerAdapter pageAdapter;
+
+	private FragmentManager manager;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Activity started");
@@ -50,16 +51,18 @@ public class ExperimentActivity extends FragmentActivity {
 		setContentView(R.layout.activity_experiment);
 
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN );
-		
+
 		setCurrentPlugin();
-		
+
 		setSaveButtonListener();
 
 		setCancelButtonListener();
 
 		setExperiment();
+		
+		setPager();
 	}
-	
+
 	private void setCurrentPlugin() {
 		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
 
@@ -68,55 +71,30 @@ public class ExperimentActivity extends FragmentActivity {
 			Toast.makeText(this, getString(R.string.err_current_plugin), Toast.LENGTH_LONG).show();
 			finish();
 		}
-		
+
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
 	}
-	
+
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */
 	private void setExperiment() {
 		m_iCurrExperiment = m_CurrTask.getCurrentExperimentIndex();
-		
+
 		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment: " + m_iCurrExperiment);
-		
-		Bundle state = new Bundle();
 
 		if (m_iCurrExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			m_CurrExperiment = new Experiment();
 		} else {
 			m_CurrExperiment = m_CurrTask.getExperiments().get(m_iCurrExperiment);
-
-			try {
-				state = m_CurrPlugin.getState(m_CurrExperiment);
-				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment state is " + state);
-				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment state is " + state.toString());
-			} catch (RemoteException e) {
-				Log.e(LOG_TAG, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
-			}
 		}
+	}
 
-		HashMap<String, String> results = new HashMap<String, String>();
-
-		// get results from experiment
-		results = m_CurrExperiment.getResults();
-
-		if (results.isEmpty()) { // experiment just created, fill the results
-			String[] resultNames;
-			try {
-				resultNames = m_CurrPlugin.getResultNames();
-
-				for (String string : resultNames) {
-					results.put(string, "-1"); // put zero as default, will be changed
-				}
-			} catch (RemoteException e) {
-				Log.e(LOG_TAG, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
-			}
-		}
+	private void setPager() {
+		manager = getSupportFragmentManager();
 
 		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
-		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state,
-				results);
+		pageAdapter = new MyPagerAdapter(manager);
 		pager.setAdapter(pageAdapter);
 
 		if (m_CurrExperiment.getResultScore() != null) {
@@ -156,8 +134,6 @@ public class ExperimentActivity extends FragmentActivity {
 	 */
 	private class MyPagerAdapter extends FragmentPagerAdapter {
 		private Fragment mCurrentFragment;
-		private Bundle mInitState;
-		private HashMap<String, String> mResults;
 
 		private ExperimentParamsFragment m_PF = null;
 		private ExperimentResultsFragment m_RF = null;
@@ -195,12 +171,8 @@ public class ExperimentActivity extends FragmentActivity {
 			super.setPrimaryItem(container, position, object);
 		}
 
-		public MyPagerAdapter(FragmentManager fm, Bundle aInitState,
-				HashMap<String, String> results) {
+		public MyPagerAdapter(FragmentManager fm) {
 			super(fm);
-
-			mInitState = aInitState;
-			mResults = results;
 
 			try {
 				bShowSteps = m_CurrPlugin.hasSteps();
@@ -219,8 +191,7 @@ public class ExperimentActivity extends FragmentActivity {
 
 			case 0:
 				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
-				m_PF = ExperimentParamsFragment.newInstance(PluginManager
-						.getInstance().getCurrentPluginName(), mInitState);
+				m_PF = ExperimentParamsFragment.newInstance();
 				return m_PF;
 			case 1:
 				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
@@ -228,12 +199,12 @@ public class ExperimentActivity extends FragmentActivity {
 					m_SF = StepsFragment.newInstance();
 					return m_SF;
 				} else {
-					m_RF = ExperimentResultsFragment.newInstance(mResults);
+					m_RF = ExperimentResultsFragment.newInstance();
 					return m_RF;
 				}
 			case 2:
 				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
-				m_RF = ExperimentResultsFragment.newInstance(mResults);
+				m_RF = ExperimentResultsFragment.newInstance();
 				return m_RF;
 
 			default:
