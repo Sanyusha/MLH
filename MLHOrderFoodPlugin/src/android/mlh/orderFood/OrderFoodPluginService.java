@@ -87,10 +87,6 @@ public class OrderFoodPluginService extends Service {
 				state.putString(Integer.toString(R.id.txt1), experiment.getParameter(RESTAURANT_NAME));
 				state.putString(Integer.toString(R.id.txt2), experiment.getParameter(DISH_NAME));
 				state.putString(Integer.toString(R.id.txt3), experiment.getParameter(NOTES));
-			} else {
-				state.putString(Integer.toString(R.id.txt1), "null");
-				state.putString(Integer.toString(R.id.txt2), "null");
-				state.putString(Integer.toString(R.id.txt3), "null");
 			}
 			
 			return state;
@@ -98,6 +94,10 @@ public class OrderFoodPluginService extends Service {
 		
 		public String[] getResultNames() throws RemoteException {
 			return RESULT_NAMES;
+		}
+
+		public boolean hasSteps() throws RemoteException {
+			return false;
 		}
     };
 }

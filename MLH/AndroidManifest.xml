@@ -12,17 +12,21 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="android.mlh.ui.MainActivity"
-            android:label="@string/task_list" >
+            android:name="android.mlh.ui.splash.SplashScreen"
+            android:theme="@style/NoActionBarTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="android.mlh.ui.MainActivity"
+            android:label="@string/task_list" >
         </activity>
         <activity
             android:name="android.mlh.ui.NewTaskActivity"

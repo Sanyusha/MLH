@@ -3,6 +3,7 @@ package android.mlh.ui;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.example.mlh.R;
 import android.mlh.aidl.Experiment;
 import android.mlh.aidl.IMLHPlugin;
 import android.mlh.bl.ScoreCalculation;
@@ -10,6 +11,8 @@ import android.mlh.bl.files.FileManager;
 import android.mlh.bl.plugins.PluginManager;
 import android.mlh.bl.tasks.Task;
 import android.mlh.bl.tasks.TaskManager;
+import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -25,29 +28,42 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mlh.R;
-
 public class ExperimentActivity extends FragmentActivity {
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "ExperimentActivity";
+
 	/**
 	 * Current experiment that we are working on in the activity
 	 */
 	private int m_iCurrExperiment;
+	private IMLHPlugin m_CurrPlugin;
 	private Experiment m_CurrExperiment;
 
 	private Task m_CurrTask;
 
-	private IMLHPlugin m_CurrPlugin;
-
 	private MyPagerAdapter pageAdapter;
 
-	private final static String LOG_D = "ExperimentActivity";
+	private FragmentManager manager;
 
 	protected void onCreate(Bundle savedInstanceState) {
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Activity started");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_experiment);
 
-		Log.d(LOG_D, "Starting loading ExperimentActivity...");
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN );
 
+		setCurrentPlugin();
+
+		setSaveButtonListener();
+
+		setCancelButtonListener();
+
+		setExperiment();
+		
+		setPager();
+	}
+
+	private void setCurrentPlugin() {
 		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
 
 		// Current plugin existence validation.
@@ -56,61 +72,29 @@ public class ExperimentActivity extends FragmentActivity {
 			finish();
 		}
 
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams. SOFT_INPUT_STATE_ALWAYS_HIDDEN );
-
 		m_CurrTask = TaskManager.getInstance().getCurrentTask();
-
-		setSaveButtonListener();
-
-		setCancelButtonListener();
-
-		setExperiment();
 	}
-
-	
 
 	/**
 	 * Sets the current experiment and displays it on the screen.
 	 */
 	private void setExperiment() {
-		m_iCurrExperiment = m_CurrTask.getCurrentExperiment();
+		m_iCurrExperiment = m_CurrTask.getCurrentExperimentIndex();
 
-		Bundle state = new Bundle();
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment: " + m_iCurrExperiment);
 
 		if (m_iCurrExperiment == Task.CURRENT_EXPERIMENT_NOT_DEFINED) {
 			m_CurrExperiment = new Experiment();
 		} else {
 			m_CurrExperiment = m_CurrTask.getExperiments().get(m_iCurrExperiment);
-
-			try {
-				state = m_CurrPlugin.getState(m_CurrExperiment);
-
-			} catch (RemoteException e) {
-				Log.e(LOG_D, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
-			}
 		}
+	}
 
-		HashMap<String, String> results = new HashMap<String, String>();
-
-		// get results from experiment
-		results = m_CurrExperiment.getResults();
-
-		if (results.isEmpty()) { // experiment just created, fill the results
-			String[] resultNames;
-			try {
-				resultNames = m_CurrPlugin.getResultNames();
-
-				for (String string : resultNames) {
-					results.put(string, "-1"); // put zero as default, will be changed
-				}
-			} catch (RemoteException e) {
-				Log.e(LOG_D, "setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
-			}
-		}
+	private void setPager() {
+		manager = getSupportFragmentManager();
 
 		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
-		pageAdapter = new MyPagerAdapter(getSupportFragmentManager(), state,
-				results);
+		pageAdapter = new MyPagerAdapter(manager);
 		pager.setAdapter(pageAdapter);
 
 		if (m_CurrExperiment.getResultScore() != null) {
@@ -123,11 +107,16 @@ public class ExperimentActivity extends FragmentActivity {
 	 * Updates the result score.
 	 */
 	private void updateResultScore() {
+		if (pageAdapter.m_RF == null) {
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Results fragment is null");
+			return;
+		}
+
 		HashMap<String, String> results = pageAdapter.m_RF
 				.captureResultsState();
 		HashMap<String, String> resultPriorities = null;
 
-		Log.d(LOG_D, "Update result score according to the following results: "
+		Log.d(LOG_TAG, "Update result score according to the following results: "
 				+ results);
 
 		TextView tv = (TextView) findViewById(R.id.txtScore);
@@ -145,11 +134,12 @@ public class ExperimentActivity extends FragmentActivity {
 	 */
 	private class MyPagerAdapter extends FragmentPagerAdapter {
 		private Fragment mCurrentFragment;
-		private Bundle mInitState;
-		private HashMap<String, String> mResults;
 
-		private ExperimentParamsFragment m_PF;
-		private ExperimentResultsFragment m_RF;
+		private ExperimentParamsFragment m_PF = null;
+		private ExperimentResultsFragment m_RF = null;
+		private StepsFragment m_SF = null;
+
+		private boolean bShowSteps;
 
 		public Fragment getCurrentFragment() {
 			return mCurrentFragment;
@@ -161,6 +151,11 @@ public class ExperimentActivity extends FragmentActivity {
 			case 0:
 				return getString(R.string.experiment_parameters);
 			case 1:
+				if (bShowSteps)
+					return getString(R.string.steps);
+				else
+					return getString(R.string.experiment_rate);
+			case 2:
 				return getString(R.string.experiment_rate);
 			default:
 				return null;
@@ -176,12 +171,18 @@ public class ExperimentActivity extends FragmentActivity {
 			super.setPrimaryItem(container, position, object);
 		}
 
-		public MyPagerAdapter(FragmentManager fm, Bundle aInitState,
-				HashMap<String, String> results) {
+		public MyPagerAdapter(FragmentManager fm) {
 			super(fm);
 
-			mInitState = aInitState;
-			mResults = results;
+			try {
+				bShowSteps = m_CurrPlugin.hasSteps();
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, 
+						"Current plugin has steps: " + bShowSteps);
+			} catch (RemoteException e) {
+				Logger.log(LOG_TAG, Logger.WARN_PRIORITY, 
+						getString(R.string.err_plugin_connection));
+				bShowSteps = false;
+			}
 		}
 
 		@Override
@@ -189,20 +190,34 @@ public class ExperimentActivity extends FragmentActivity {
 			switch (pos) {
 
 			case 0:
-				m_PF = ExperimentParamsFragment.newInstance(PluginManager
-						.getInstance().getCurrentPluginName(), mInitState);
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
+				m_PF = ExperimentParamsFragment.newInstance();
 				return m_PF;
 			case 1:
-				m_RF = ExperimentResultsFragment.newInstance(mResults);
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
+				if (bShowSteps) {
+					m_SF = StepsFragment.newInstance();
+					return m_SF;
+				} else {
+					m_RF = ExperimentResultsFragment.newInstance();
+					return m_RF;
+				}
+			case 2:
+				Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, pos + "");
+				m_RF = ExperimentResultsFragment.newInstance();
 				return m_RF;
+
 			default:
 				return null;
 			}
 		}
 
-		@Override
+
+		/* 
+		 * Returns 3 if the plugin has steps otherwise 2.
+		 */
 		public int getCount() {
-			return 2;
+			return (bShowSteps ? 3 : 2);
 		}
 	}
 
@@ -218,6 +233,8 @@ public class ExperimentActivity extends FragmentActivity {
 
 					updateExperimentResults();
 
+					updateExperimentSteps();
+
 					updateResultScore();
 
 					updateCurrentTask();
@@ -226,15 +243,15 @@ public class ExperimentActivity extends FragmentActivity {
 							getString(R.string.experiment_saved),
 							Toast.LENGTH_LONG).show();
 
-					Log.d(LOG_D, "Experiment added: " + m_CurrExperiment.toString());
-					
+					Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Experiment saved: " + m_CurrExperiment.toString());
+
 					// exit the experiment activity
 					finish();
 
 				} catch (RemoteException e) {
-					Log.e(LOG_D, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+					Log.e(LOG_TAG, "save experiment: " + getString(R.string.err_plugin_connection) + ": " + e + " " + e.getStackTrace());
 				} catch (IOException e) {
-					Log.e(LOG_D, "save experiment: " + ": " + e.getMessage());
+					Log.e(LOG_TAG, "save experiment: " + ": " + e.getMessage());
 				}
 			}
 		});
@@ -259,18 +276,30 @@ public class ExperimentActivity extends FragmentActivity {
 	}
 
 	private void updateExperimentParams() throws RemoteException {
-		Bundle currState = pageAdapter.m_PF.captureParametersState();
-		Log.d(LOG_D, "Parameters state captured: " + currState);
-		Log.d(LOG_D, m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment).getParameters().toString());
+		if (pageAdapter.m_PF != null) {
+			Bundle currState = pageAdapter.m_PF.captureParametersState();
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Parameters state captured: " + currState);
 
-		Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
+			Experiment updatedExperiment = m_CurrPlugin.updateExperimentParams(currState, m_CurrExperiment);
 
-		m_CurrExperiment.setParameters(updatedExperiment.getParameters());
+			m_CurrExperiment.setParameters(updatedExperiment.getParameters());
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with parameters: " + m_CurrExperiment.getParameters());
+		}
 	}
 
-	private void updateExperimentResults() throws RemoteException {
-		HashMap<String, String> results = pageAdapter.m_RF.captureResultsState();
-		m_CurrExperiment.setResults(results);
+	private void updateExperimentResults() {
+		if (pageAdapter.m_RF != null) {
+			HashMap<String, String> results = pageAdapter.m_RF.captureResultsState();
+			m_CurrExperiment.setResults(results);
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with results: " + m_CurrExperiment.getResults());
+		}
+	}
+
+	private void updateExperimentSteps() {
+		if (pageAdapter.m_SF != null) {
+			m_CurrExperiment.setSteps(pageAdapter.m_SF.captureSteps());
+			Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "Current experiment updated with " + m_CurrExperiment.getStepsCount() + "steps");
+		}
 	}
 
 	/**

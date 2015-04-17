@@ -3,11 +3,20 @@ package android.mlh.ui;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.mlh.aidl.Experiment;
+import android.mlh.aidl.IMLHPlugin;
+import android.mlh.bl.plugins.PluginManager;
+import android.mlh.bl.tasks.TaskManager;
+import android.mlh.constants.UIConstatns;
+import android.mlh.logger.Logger;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.RatingBar;
@@ -21,22 +30,60 @@ import com.example.mlh.R;
  * and not by the plugin.
  */
 public class ExperimentResultsFragment extends ListFragment {
-
-	private final static String LOG_D = "ExperimentResultsFragment";
+	private final static String LOG_TAG = UIConstatns.LOG_PREFIX + "ExperimentResultsFragment";
+	
 	private final static String NO_SCORE = "-1";
 	
 	private static ExperimentResultsFragment f;
-	private HashMap<String, String> m_Results;
-
+	
 	private ListAdapter m_ListAdapter;
 	
 	private final int MAX_SCORE = 100;
 	private final int DEFAULT_SCORE = 80;
 	
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_experiment_results, container, false);
+	private IMLHPlugin m_CurrPlugin;
+	private Experiment m_CurrExperiment;
+	
+	private HashMap<String, String> m_Results;
+	
+	public static ExperimentResultsFragment newInstance() {
+		if (f == null) {
+			f = new ExperimentResultsFragment();
+		}
 
-		Log.d(LOG_D, "onCreateView: experiment results are: " + m_Results);
+		return f;
+	}
+	
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Logger.log(LOG_TAG, Logger.INFO_PRIORITY, "Fragment started");
+		
+		View v = inflater.inflate(R.layout.fragment_experiment_results, container, false);
+		
+		m_CurrPlugin = PluginManager.getInstance().getCurrentPlugin();
+		m_CurrExperiment = TaskManager.getInstance().getCurrentExperiment();
+		
+		m_Results = new HashMap<String, String>();
+
+		// get results from experiment
+		if (m_CurrExperiment != null) {
+			m_Results = m_CurrExperiment.getResults();
+		}
+		
+		if (m_Results.isEmpty()) { // experiment just created, fill the results
+			String[] resultNames;
+			try {
+				resultNames = m_CurrPlugin.getResultNames();
+
+				for (String string : resultNames) {
+					m_Results.put(string, NO_SCORE); // put zero as default, will be changed
+				}
+			} catch (RemoteException e) {
+				Logger.log(LOG_TAG, Logger.WARN_PRIORITY, 
+						"setExperiment: " + getString(R.string.err_plugin_connection) + ": " + e.getMessage());
+			}
+		}
+		
+		Logger.log(LOG_TAG, Logger.DEBUG_PRIORITY, "onCreateView: experiment results are: " + m_Results);
 		
 		// You can't simply cast an Object[] array to a String[] array. 
 		// You should instead use the generic version of toArray, which should work better.
@@ -48,23 +95,13 @@ public class ExperimentResultsFragment extends ListFragment {
 		return v;
 	}
 
-	public static ExperimentResultsFragment newInstance(HashMap<String, String> a_Results) {
-		if (f == null) {
-			f = new ExperimentResultsFragment();
-		}
-
-		f.m_Results = a_Results;
-
-		return f;
-	}
-
 	/**
 	 * Returns the results state that is displayed on the screen.
 	 * @return
 	 * the hashmap of results
 	 */
 	public HashMap<String, String> captureResultsState() {
-		Log.d(LOG_D, "Capturing results state from fragment.");
+		Log.d(LOG_TAG, "Capturing results state from fragment.");
 
 		return m_ListAdapter.m_NewResults;
 	}
@@ -107,7 +144,7 @@ public class ExperimentResultsFragment extends ListFragment {
 					m_NewResults.put(m_Items[position], m_Results.get(m_Items[position]));
 				}
 				
-				Log.d(LOG_D, "The current result for " + m_Items[position] + " is " + m_NewResults.get(m_Items[position]));
+				Log.d(LOG_TAG, "The current result for " + m_Items[position] + " is " + m_NewResults.get(m_Items[position]));
 				
 				rb.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
@@ -116,7 +153,7 @@ public class ExperimentResultsFragment extends ListFragment {
 					}
 				}
 				);
-
+				
 				holder.tv = tv;
 				holder.rb = rb;
 
@@ -128,6 +165,8 @@ public class ExperimentResultsFragment extends ListFragment {
 			holder.tv.setText(m_Items[position]);
 			holder.rb.setRating(Float.parseFloat(m_NewResults.get(holder.tv.getText()))
 					* holder.rb.getNumStars() / MAX_SCORE);
+			
+			
 			
 			return v;
 		}

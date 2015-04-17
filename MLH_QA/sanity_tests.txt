@@ -1,0 +1,10 @@
+
+----------------------------------------------
+SANITY TESTS OF MLH
+----------------------------------------------
+
+Remove all plugins
+Remove the app
+
+Install MLH
+Install plugins. After plugin is installed, start MLH and check that it identifies the correct number of plugins.

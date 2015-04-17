@@ -3,39 +3,45 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:paddingTop="10dp" >
+    android:paddingTop="10dp"
+    android:background="@drawable/glossy_gradient" >
 
     <TextView
         android:id="@+id/txtTitle"
         style="@style/TitleFont"
         android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginLeft="10dp"
         android:textColor="@color/red" />
 
     <TextView
         android:id="@+id/txtTaskName"
         style="@style/SubTitleFont"
         android:layout_width="wrap_content"
-        android:layout_height="40dp" />
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/gray" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:layout_margin="5dp"
-        android:background="@android:color/background_light" />
+        android:background="@android:color/darker_gray" />
 
-    <ListView
-        android:id="@+id/android:list"
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_margin="5dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:listSelector="@drawable/list_selector" />
 
     <Button
         android:id="@+id/btn_new_experiment"
-        style="@style/Button"
-        android:layout_height="50dp"
-        android:text="@string/create_new_experiment"
-        android:layout_width="wrap_content" />
+        style="@style/NiceButton"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:text="@string/create_new_experiment" />
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package android.mlh.aidl;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -16,9 +17,19 @@ import android.util.Log;
 public final class Experiment implements Parcelable, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String STEP_DESCRIPTION = "step_description";
+	public static final String STEP_TIME = "step_time";
+	
 	private HashMap<String, String> mParameters;
 	private HashMap<String, String> mResults;
-	private String mResultScore;
+	
+	// All the experiment steps will be stored in this array list.
+	// Every step is a collection of properties like:
+	// {description="...", time="...", ...}
+	private ArrayList<HashMap<String, String>> mSteps;
+	
+	private String mResultScore = "no score";
 	private Date creationDate;
 
 	private static final String LOG_D = "Experiment";
@@ -36,10 +47,35 @@ public final class Experiment implements Parcelable, Serializable {
 	public Experiment() {
 		mParameters = new HashMap<String, String>();
 		mResults = new HashMap<String, String>();
-
+		
+		mSteps = new ArrayList<HashMap<String,String>>();
+		
 		creationDate = new Date();
 	}
-
+	
+	/**
+	 * Adds an empty step to the map;
+	 */
+	public void addStep() {
+		this.mSteps.add(new HashMap<String, String>());
+	}
+	
+	public ArrayList<HashMap<String, String>> getSteps() {
+		return this.mSteps;
+	}
+	
+	public HashMap<String, String> getStep(int index) {
+		return this.mSteps.get(index);
+	}
+	
+	public int getStepsCount() {
+		return this.mSteps.size();
+	}
+	
+	public void setSteps(ArrayList<HashMap<String, String>> a_Steps) {
+		mSteps = a_Steps;
+	}
+	
 	public void addParameter(String paramName, String paramValue) {
 		mParameters.put(paramName, paramValue);
 	}
@@ -99,8 +135,9 @@ public final class Experiment implements Parcelable, Serializable {
 	}
 
 	public String toString() {
-		return "Experiment [mParameters=" + mParameters + ", mResults="
-				+ mResults + ", mResultScore=" + mResultScore + "]";
+		return "Experiment [mParameters = " + mParameters + ", mResults = "
+				+ mResults + ", mStepsCount = "
+				+ mSteps.size() + ", mResultScore=" + mResultScore + "]";
 	}
 
 	private Experiment(Parcel in) {
