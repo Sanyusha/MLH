@@ -38,6 +38,11 @@
             android:name="android.mlh.ui.ExperimentListActivity"
             android:label="@string/experiment_list" >
         </activity>
+        <activity
+            android:name="android.mlh.widgets.AddExperimentWidgetConfigurationActivity"
+            android:label="@string/widget_config" >
+        </activity>
+        
 
         <receiver android:name="android.mlh.widgets.NewTaskWidgetProvider" android:label="MLH widget#1" >
             <intent-filter>

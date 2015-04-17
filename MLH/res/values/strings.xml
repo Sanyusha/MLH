@@ -36,4 +36,6 @@
 	<string name="set_task_tv">Set</string>
 	
 	<string name="goto_task_widget_tv">Go</string>
+	
+	<string name="widget_config">Widget Configuration...</string>
 </resources>

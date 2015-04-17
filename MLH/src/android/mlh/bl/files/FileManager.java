@@ -2,13 +2,11 @@ package android.mlh.bl.files;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -206,94 +204,5 @@ public class FileManager {
 		_instance.switchContext(context);
 
 		return _instance;
-	}
-
-	// createWidgetFile ()
-	// deleteWidgetFile ()
-	// getTaskForWidgetId (int widget_id)
-	// setTaskForWidgetId (String task_name, int widget_id)
-	// deleteWidgetId (int widget_id)
-
-	// 1. File per Widget
-	// 2. File for all Widgets
-
-	public void createWidgetFile() throws IOException {
-		String filename = FileConstatns.WIDGET_ADD_EXPERIMENT_FILE_NAME
-				+ FileConstatns.OBJECT_FILE_NAME_EXT;
-		FileOutputStream fileOut;
-		fileOut = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-		HashMap<Integer, String> widget_map = new HashMap<Integer, String>();
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
-		out.writeObject(widget_map);
-		out.close();
-		fileOut.close();
-	}
-
-	public void deleteWidgetFile() {
-		String filename = FileConstatns.WIDGET_ADD_EXPERIMENT_FILE_NAME
-				+ FileConstatns.OBJECT_FILE_NAME_EXT;
-		File filesDir = mContext.getFilesDir();
-		File widget_map_file = new File(filesDir.getPath() + filename);
-		widget_map_file.delete();
-	}
-
-	public void setTaskForWidgetId(String task_name, int widget_id)
-			throws IOException, ClassNotFoundException {
-		String filename = FileConstatns.WIDGET_ADD_EXPERIMENT_FILE_NAME
-				+ FileConstatns.OBJECT_FILE_NAME_EXT;
-		FileInputStream fileIn;
-		fileIn = mContext.openFileInput(filename);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
-		HashMap<Integer, String> widget_map = (HashMap<Integer, String>) in
-				.readObject();
-		in.close();
-		fileIn.close();
-
-		widget_map.put(widget_id, task_name);
-
-		FileOutputStream fileOut;
-		fileOut = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
-		out.writeObject(widget_map);
-		out.close();
-		fileOut.close();
-	}
-
-	public String getTaskForWidgetId(int widget_id) throws IOException,
-			ClassNotFoundException {
-		String filename = FileConstatns.WIDGET_ADD_EXPERIMENT_FILE_NAME
-				+ FileConstatns.OBJECT_FILE_NAME_EXT;
-		FileInputStream fileIn;
-		fileIn = mContext.openFileInput(filename);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
-		HashMap<Integer, String> widget_map = (HashMap<Integer, String>) in
-				.readObject();
-		in.close();
-		fileIn.close();
-
-		return widget_map.get(widget_id);
-	}
-
-	public void deleteWidgetId(int widget_id) throws IOException,
-			ClassNotFoundException {
-		String filename = FileConstatns.WIDGET_ADD_EXPERIMENT_FILE_NAME
-				+ FileConstatns.OBJECT_FILE_NAME_EXT;
-		FileInputStream fileIn;
-		fileIn = mContext.openFileInput(filename);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
-		HashMap<Integer, String> widget_map = (HashMap<Integer, String>) in
-				.readObject();
-		in.close();
-		fileIn.close();
-
-		widget_map.remove(widget_id);
-
-		FileOutputStream fileOut;
-		fileOut = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
-		out.writeObject(widget_map);
-		out.close();
-		fileOut.close();
-
 	}
 }

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="horizontal" >
 
     <TextView
@@ -9,13 +10,19 @@
         android:layout_width="0dp"
         android:layout_height="fill_parent"
         android:layout_weight="1"
-        android:text="@string/set_task_tv" />
+        android:background="@color/DarkBlue"
+        android:gravity="center"
+        android:text="@string/set_task_tv"
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/goto_task_widget_tv"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
         android:layout_weight="1"
-        android:text="@string/goto_task_widget_tv" />
+        android:background="@color/Ivory"
+        android:gravity="center"
+        android:text="@string/goto_task_widget_tv"
+        android:textSize="10sp" />
 
 </LinearLayout>
